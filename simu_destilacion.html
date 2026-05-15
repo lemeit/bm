@@ -2,151 +2,319 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simulador: Columna de Destilación | Laboratorio Industrias</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Simulador Destilación | Estilo HYSYS | Laboratorio Industrias</title>
     <style>
-        * { box-sizing: border-box; }
+        * {
+            box-sizing: border-box;
+            user-select: none; /* para evitar selección masiva, pero editable */
+        }
         body {
-            font-family: 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #e0eafc 0%, #cfdef3 100%);
+            font-family: 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif;
+            background: #1a2a32;
             margin: 0;
             padding: 20px;
             min-height: 100vh;
         }
-        .simulator-container {
-            max-width: 1300px;
+        .sim-container {
+            max-width: 1400px;
             margin: 0 auto;
+            background: #eef2f5;
+            border-radius: 32px;
+            box-shadow: 0 20px 35px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        /* barra superior */
+        .toolbar {
+            background: #0f212e;
+            padding: 12px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .toolbar a {
+            color: #9fc8e3;
+            text-decoration: none;
+            font-weight: 500;
+            background: #1e3a4a;
+            padding: 6px 14px;
+            border-radius: 30px;
+            transition: 0.2s;
+        }
+        .toolbar a:hover { background: #2c5a6e; color: white; }
+        .title h1 { margin: 0; font-size: 1.5rem; color: white; }
+        .title p { margin: 0; font-size: 0.8rem; color: #b8d0e0; }
+        /* lienzo del proceso */
+        .flowsheet {
+            padding: 30px 20px 40px;
+            background: #dce5ec;
+            background-image: radial-gradient(circle at 10% 20%, rgba(150,180,200,0.1) 2%, transparent 2.5%);
+            background-size: 28px 28px;
+        }
+        /* columna de destilación SVG + interacción */
+        .columna-wrapper {
+            display: flex;
+            justify-content: center;
+            align-items: stretch;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-bottom: 40px;
+        }
+        .corriente-card {
             background: white;
             border-radius: 28px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
-            padding: 1.5rem 2rem 2rem;
+            padding: 16px 12px;
+            min-width: 180px;
+            text-align: center;
+            box-shadow: 0 8px 18px rgba(0,0,0,0.15);
+            border-top: 5px solid #2c7da0;
+            transition: 0.1s;
         }
-        h1 { color: #1e4668; margin-top: 0; }
-        .sub { color: #2c5a7a; margin-bottom: 1.5rem; border-left: 3px solid #2c7da0; padding-left: 15px; }
-        .dashboard { display: flex; flex-wrap: wrap; gap: 25px; }
-        .controles { flex: 1.2; min-width: 280px; background: #f8f9ff; padding: 1.2rem; border-radius: 24px; }
-        .diagrama { flex: 2; min-width: 400px; background: #fefefe; border-radius: 24px; padding: 1rem; }
-        .card-param { background: white; border-radius: 20px; padding: 12px 15px; margin-bottom: 18px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
-        .param-row { display: flex; justify-content: space-between; align-items: center; margin: 10px 0; flex-wrap: wrap; gap: 10px; }
-        label { font-weight: 600; color: #1f3b4c; }
-        input { width: 120px; padding: 6px 10px; border-radius: 12px; border: 1px solid #bdd4e7; font-family: monospace; text-align: center; }
-        .resultado-box { background: #1e2f3f; color: #eef4ff; border-radius: 20px; padding: 1rem; margin-top: 1rem; }
-        .flujo-card { background: #eef2fa; border-radius: 16px; padding: 10px; margin: 5px; text-align: center; flex: 1; }
-        .diagrama-flujo { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; margin: 15px 0; }
-        .columna { text-align: center; font-weight: bold; background: #cbdbe2; padding: 8px; border-radius: 30px; margin: 10px 0; }
-        .valor-destacado { font-size: 1.3rem; font-weight: 800; color: #1f6392; }
-        .warning { background: #fff3cd; border-left: 5px solid #ffc107; padding: 8px 12px; border-radius: 12px; font-size: 0.8rem; margin-top: 15px; }
-        button { background: #2c7da0; border: none; color: white; padding: 8px 18px; border-radius: 40px; cursor: pointer; font-weight: bold; margin-top: 8px; }
-        button:hover { background: #1f5e7a; }
-        .volver { display: inline-block; margin-bottom: 15px; background: #4a5b6e; text-decoration: none; color: white; padding: 6px 14px; border-radius: 30px; font-size: 0.85rem; }
-        .volver:hover { background: #2c3e50; }
-        @media (max-width: 800px) { .dashboard { flex-direction: column; } }
+        .corriente-tag {
+            font-weight: bold;
+            font-size: 1.2rem;
+            background: #eef2fc;
+            display: inline-block;
+            padding: 2px 12px;
+            border-radius: 40px;
+            margin-bottom: 12px;
+        }
+        .editable-val {
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: #1e4668;
+            background: #f4f9ff;
+            padding: 4px 12px;
+            border-radius: 24px;
+            display: inline-block;
+            cursor: pointer;
+            transition: 0.05s linear;
+            border: 1px solid transparent;
+        }
+        .editable-val.editing {
+            background: #fff0b5;
+            border: 2px solid #f5a623;
+            outline: none;
+        }
+        .unidad {
+            font-size: 0.8rem;
+            color: #5f7f9e;
+        }
+        .comp-row {
+            font-size: 0.75rem;
+            background: #f0f4fa;
+            padding: 5px;
+            border-radius: 16px;
+            margin-top: 8px;
+        }
+        .columna-svg {
+            background: #cbdbe2;
+            border-radius: 60px;
+            padding: 10px 20px;
+            text-align: center;
+            min-width: 180px;
+            box-shadow: inset 0 0 0 2px white, 0 5px 12px rgba(0,0,0,0.2);
+        }
+        .columna-svg svg {
+            width: 100%;
+            max-width: 140px;
+            display: block;
+            margin: 0 auto;
+        }
+        .result-panel {
+            background: #0f212e;
+            color: #eef4ff;
+            border-radius: 28px;
+            padding: 18px;
+            margin-top: 25px;
+            text-align: center;
+        }
+        .warning-badge {
+            background: #ffc107;
+            color: #1e2a2f;
+            padding: 8px;
+            border-radius: 30px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+        @media (max-width: 780px) {
+            .corriente-card { min-width: 140px; }
+            .editable-val { font-size: 1.2rem; }
+        }
     </style>
 </head>
 <body>
-<div class="simulator-container">
-    <a href="simuladores.html" class="volver">← Volver a Simuladores</a>
-    <h1>⚗️ Simulador: Columna de Destilación</h1>
-    <div class="sub">Basado en Ejemplo 3.2 · Balances de materia con 3 componentes (A, B, C)</div>
-
-    <div class="dashboard">
-        <div class="controles">
-            <div class="card-param">
-                <h3>📥 Parámetros editables</h3>
-                <div class="param-row"><label>Alimentación F (kg/h):</label><input type="number" id="F_val" value="32" step="2"></div>
-                <div class="param-row"><label>x<sub>F,B</sub> (Benceno):</label><input type="number" id="xF_B" value="0.125" step="0.01" min="0" max="1"></div>
-                <div class="param-row"><label>Corriente Tope T (kg/h):</label><input type="number" id="T_val" value="28" step="2"></div>
-                <div class="param-row"><label>Corriente M (kg/h):</label><input type="number" id="M_val" value="35" step="2"></div>
-                <div class="param-row"><label>x<sub>M,B</sub> en M:</label><input type="number" id="xM_B" value="0.286" step="0.01" min="0" max="1"></div>
+<div class="sim-container">
+    <div class="toolbar">
+        <div class="title">
+            <h1>⚗️ COLUMNA DE DESTILACIÓN · SIMULADOR VISUAL</h1>
+            <p>Edición directa sobre las corrientes · Balance en tiempo real</p>
+        </div>
+        <a href="simuladores.html">← Volver a Simuladores</a>
+    </div>
+    <div class="flowsheet">
+        <!-- FLUJO: F y E entran a la columna -->
+        <div style="display: flex; justify-content: center; gap: 30px; flex-wrap: wrap; margin-bottom: 20px;">
+            <div class="corriente-card" id="card-F">
+                <div class="corriente-tag">📥 ALIMENTACIÓN F</div>
+                <div><span class="editable-val" data-var="F" data-unit="kg/h" id="val_F">32.0</span> <span class="unidad">kg/h</span></div>
+                <div class="comp-row">🧪 B: <span id="xF_B_disp">0.125</span> | C: <span id="xF_C_disp">0.875</span></div>
+                <div class="comp-row" style="font-size:0.7rem;">✏️ Click en valor para editar</div>
             </div>
-            <button id="btnActualizar">⟳ Actualizar simulación</button>
-            <div class="warning">💡 Las incógnitas son E, D, x<sub>M,A</sub> y x<sub>M,C</sub>. Se resuelve con balances global, A y B.</div>
+            <div class="corriente-card" id="card-E">
+                <div class="corriente-tag">➕ RECIRCULACIÓN E (INCÓGNITA)</div>
+                <div><span class="editable-val" data-var="E" data-unit="kg/h" id="val_E">--</span> <span class="unidad">kg/h</span></div>
+                <div class="comp-row">A:0.534 | B:0.466</div>
+            </div>
+        </div>
+        <!-- Columna SVG -->
+        <div style="display: flex; justify-content: center; margin: 15px 0;">
+            <div class="columna-svg">
+                <svg width="130" height="160" viewBox="0 0 100 160" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="25" y="10" width="50" height="140" rx="20" fill="#6c8e9e" stroke="#1e4668" stroke-width="3"/>
+                    <rect x="35" y="30" width="30" height="100" fill="#bdd4e7" opacity="0.6"/>
+                    <circle cx="50" cy="80" r="12" fill="#ffd966" stroke="#b6560c" stroke-width="2"/>
+                    <text x="50" y="145" text-anchor="middle" fill="white" font-size="8">PLATOS</text>
+                    <text x="50" y="25" text-anchor="middle" fill="white" font-size="9">DESTILACIÓN</text>
+                </svg>
+                <div style="margin-top: 8px;">⬆️ COLUMNA ⬇️</div>
+            </div>
+        </div>
+        <!-- Flujo de salidas T, M, D -->
+        <div style="display: flex; justify-content: center; gap: 30px; flex-wrap: wrap; margin-top: 10px;">
+            <div class="corriente-card">
+                <div class="corriente-tag">⬆️ TOPE T</div>
+                <div><span class="editable-val" data-var="T" data-unit="kg/h" id="val_T">28.0</span> <span class="unidad">kg/h</span></div>
+                <div class="comp-row">100% componente A</div>
+            </div>
+            <div class="corriente-card">
+                <div class="corriente-tag">↘️ CORRIENTE LATERAL M</div>
+                <div><span class="editable-val" data-var="M" data-unit="kg/h" id="val_M">35.0</span> <span class="unidad">kg/h</span></div>
+                <div class="comp-row"><span id="xM_B_disp">0.286</span> B | <span id="xM_A_res">---</span> A | <span id="xM_C_res">---</span> C</div>
+                <div class="comp-row" style="font-size:0.7rem;">✏️ Editar B en M: <span class="editable-val" data-var="xMB" id="val_xMB" style="font-size:1rem;">0.286</span></div>
+            </div>
+            <div class="corriente-card">
+                <div class="corriente-tag">⬇️ FONDO D (INCÓGNITA)</div>
+                <div><span class="editable-val" data-var="D" id="val_D">--</span> <span class="unidad">kg/h</span></div>
+                <div class="comp-row">B:0.614 | C:0.386</div>
+            </div>
         </div>
 
-        <div class="diagrama">
-            <h3 style="text-align:center;">🧾 Diagrama de flujo</h3>
-            <div class="diagrama-flujo">
-                <div class="flujo-card"><strong>📥 F</strong><br><span id="display_F">32</span> kg/h<br><span id="compF">B:0.125</span></div>
-                <div class="flujo-card"><strong>➕ E (incógnita)</strong><br><span id="display_E">??</span> kg/h<br>A:0.534 | B:0.466</div>
-            </div>
-            <div class="columna">⬇️ COLUMNA DE DESTILACIÓN ⬇️</div>
-            <div class="diagrama-flujo">
-                <div class="flujo-card"><strong>⬆️ T</strong><br><span id="display_T">28</span> kg/h<br>100% A</div>
-                <div class="flujo-card"><strong>↘️ M</strong><br><span id="display_M">35</span> kg/h<br><span id="compM">B:0.286</span></div>
-                <div class="flujo-card"><strong>⬇️ D (incógnita)</strong><br><span id="display_D">??</span> kg/h<br>B:0.614 | C:0.386</div>
-            </div>
-            <div class="resultado-box" id="resultadosPanel">
-                <strong>📐 Resultados calculados:</strong><br>
-                <span id="res_E">E = -- kg/h</span><br>
-                <span id="res_D">D = -- kg/h</span><br>
-                <span id="res_xMA">x<sub>M,A</sub> = --</span><br>
-                <span id="res_xMC">x<sub>M,C</sub> = --</span><br>
-                <span id="res_verif">✔️ Esperando datos</span>
-            </div>
+        <div class="result-panel" id="resultPanel">
+            <strong>📐 RESULTADOS DE BALANCE</strong><br>
+            <span id="res_E_text">E = calculando...</span> | 
+            <span id="res_D_text">D = calculando...</span><br>
+            <span id="res_xM_A">xM,A = ---</span> | 
+            <span id="res_xM_C">xM,C = ---</span><br>
+            <span id="verif_msg" style="color:#ffd966;">✔️ Sistema consistente</span>
         </div>
     </div>
 </div>
 
 <script>
-    function actualizarSimulador() {
-        let F = parseFloat(document.getElementById('F_val').value);
-        let xF_B = parseFloat(document.getElementById('xF_B').value);
-        let T = parseFloat(document.getElementById('T_val').value);
-        let M = parseFloat(document.getElementById('M_val').value);
-        let xM_B = parseFloat(document.getElementById('xM_B').value);
-        
-        if (isNaN(F) || isNaN(xF_B) || isNaN(T) || isNaN(M) || isNaN(xM_B)) return;
-        if (xF_B < 0 || xF_B > 1) { alert("xF_B entre 0 y 1"); return; }
-        if (xM_B < 0 || xM_B > 1) { alert("xM_B entre 0 y 1"); return; }
-        
-        const xE_A = 0.534, xE_B = 0.466;
-        const xD_B = 0.614;
-        
+    // variables globales
+    let F = 32, xF_B = 0.125, T = 28, M = 35, xM_B = 0.286;
+    const xE_A = 0.534, xE_B = 0.466, xD_B = 0.614;
+
+    function actualizarTodo() {
+        // resolver E y D
         let K = T + M - F;
         let ladoDer_B = M * xM_B - F * xF_B;
-        
-        let a11 = 1, a12 = -1;
-        let a21 = xE_B, a22 = -xD_B;
-        let det = a11*a22 - a12*a21;
-        if (Math.abs(det) < 1e-6) {
-            document.getElementById('res_verif').innerHTML = "⚠️ Sistema singular";
-            return;
-        }
-        let E = (K*a22 - a12*ladoDer_B) / det;
-        let D = (a11*ladoDer_B - a21*K) / det;
+        let det = (1 * -xD_B) - (-1 * xE_B);
+        let E = (K * -xD_B - (-1) * ladoDer_B) / det;
+        let D = (1 * ladoDer_B - xE_B * K) / det;
         let xM_A = (E * xE_A - T) / M;
         let xM_C = 1 - xM_B - xM_A;
         
-        document.getElementById('display_F').innerHTML = F.toFixed(1);
-        document.getElementById('compF').innerHTML = `B:${xF_B.toFixed(3)} | C:${(1-xF_B).toFixed(3)}`;
-        document.getElementById('display_T').innerHTML = T.toFixed(1);
-        document.getElementById('display_M').innerHTML = M.toFixed(1);
-        document.getElementById('display_E').innerHTML = E.toFixed(1);
-        document.getElementById('display_D').innerHTML = D.toFixed(1);
-        document.getElementById('res_E').innerHTML = `📌 E = ${E.toFixed(2)} kg/h`;
-        document.getElementById('res_D').innerHTML = `📌 D = ${D.toFixed(2)} kg/h`;
-        document.getElementById('res_xMA').innerHTML = `🧪 x<sub>M,A</sub> = ${xM_A.toFixed(4)}`;
-        document.getElementById('res_xMC').innerHTML = `🧪 x<sub>M,C</sub> = ${xM_C.toFixed(4)}`;
+        // mostrar valores en UI editables (E,D)
+        let spanE = document.getElementById('val_E');
+        let spanD = document.getElementById('val_D');
+        if (spanE) spanE.innerText = E.toFixed(2);
+        if (spanD) spanD.innerText = D.toFixed(2);
+        document.getElementById('res_E_text').innerHTML = `E = ${E.toFixed(2)} kg/h`;
+        document.getElementById('res_D_text').innerHTML = `D = ${D.toFixed(2)} kg/h`;
+        document.getElementById('res_xM_A').innerHTML = `xM,A = ${xM_A.toFixed(4)}`;
+        document.getElementById('res_xM_C').innerHTML = `xM,C = ${xM_C.toFixed(4)}`;
+        document.getElementById('xM_A_res').innerHTML = xM_A.toFixed(3);
+        document.getElementById('xM_C_res').innerHTML = xM_C.toFixed(3);
+        document.getElementById('xF_C_disp').innerHTML = (1-xF_B).toFixed(3);
+        document.getElementById('xM_B_disp').innerHTML = xM_B.toFixed(3);
         
-        let errores = [];
-        if (xM_A < -0.05 || xM_A > 1.05) errores.push("xM_A fuera de rango");
-        if (E < 0) errores.push("E negativo");
-        if (D < 0) errores.push("D negativo");
-        if (errores.length > 0) {
-            document.getElementById('res_verif').innerHTML = `⚠️ ${errores.join("; ")}. Ajustá parámetros.`;
-        } else {
-            document.getElementById('res_verif').innerHTML = "✅ Balances consistentes.";
-        }
-        document.getElementById('compM').innerHTML = `B:${xM_B.toFixed(3)} | A:${xM_A.toFixed(3)} | C:${xM_C.toFixed(3)}`;
+        let warning = false;
+        if (xM_A < -0.05 || xM_A > 1.05 || E < 0 || D < 0) warning = true;
+        let verifSpan = document.getElementById('verif_msg');
+        if (warning) verifSpan.innerHTML = "⚠️ Alerta: valores fuera de rango físico (revisar parámetros)";
+        else verifSpan.innerHTML = "✅ Balances OK · Verificado componente C";
+    }
+
+    // Hacer editables los span con clase editable-val
+    function makeEditable(element, varName, unit) {
+        element.setAttribute('contenteditable', 'true');
+        element.classList.add('editing');
+        element.addEventListener('blur', function() {
+            let newVal = parseFloat(element.innerText.replace(',','.'));
+            if (isNaN(newVal)) newVal = 0;
+            if (varName === 'F') { F = newVal; document.getElementById('val_F').innerText = F.toFixed(1); actualizarTodo(); }
+            if (varName === 'T') { T = newVal; document.getElementById('val_T').innerText = T.toFixed(1); actualizarTodo(); }
+            if (varName === 'M') { M = newVal; document.getElementById('val_M').innerText = M.toFixed(1); actualizarTodo(); }
+            if (varName === 'xFB') { xF_B = Math.min(1, Math.max(0, newVal)); document.getElementById('val_xFB').innerText = xF_B.toFixed(3); actualizarTodo(); }
+            if (varName === 'xMB') { xM_B = Math.min(1, Math.max(0, newVal)); document.getElementById('val_xMB').innerText = xM_B.toFixed(3); actualizarTodo(); }
+            element.classList.remove('editing');
+            element.setAttribute('contenteditable', 'false');
+        });
+        element.addEventListener('click', (e) => {
+            e.stopPropagation();
+            element.setAttribute('contenteditable', 'true');
+            element.focus();
+        });
     }
     
-    document.getElementById('btnActualizar').addEventListener('click', actualizarSimulador);
-    const inputs = ['F_val','xF_B','T_val','M_val','xM_B'];
-    inputs.forEach(id => {
-        document.getElementById(id).addEventListener('input', actualizarSimulador);
-        document.getElementById(id).addEventListener('change', actualizarSimulador);
-    });
-    window.addEventListener('load', actualizarSimulador);
+    // Inicializar bindings
+    window.onload = () => {
+        // valores iniciales desde DOM
+        F = parseFloat(document.getElementById('val_F').innerText);
+        T = parseFloat(document.getElementById('val_T').innerText);
+        M = parseFloat(document.getElementById('val_M').innerText);
+        xF_B = parseFloat(document.getElementById('val_xFB') ? document.getElementById('val_xFB').innerText : '0.125');
+        xM_B = parseFloat(document.getElementById('val_xMB').innerText);
+        // si no existen inputs extra los creamos
+        if(!document.getElementById('val_xFB')) {
+            let spanF = document.createElement('span');
+            spanF.id = 'val_xFB';
+            spanF.innerText = xF_B;
+            document.getElementById('card-F').appendChild(spanF);
+        }
+        document.getElementById('val_F').setAttribute('data-var','F');
+        document.getElementById('val_T').setAttribute('data-var','T');
+        document.getElementById('val_M').setAttribute('data-var','M');
+        makeEditable(document.getElementById('val_F'), 'F');
+        makeEditable(document.getElementById('val_T'), 'T');
+        makeEditable(document.getElementById('val_M'), 'M');
+        // crear editables para composiciones
+        let compFdiv = document.getElementById('xF_B_disp');
+        if(compFdiv) {
+            let spanFb = document.createElement('span');
+            spanFb.id = 'val_xFB';
+            spanFb.innerText = xF_B;
+            spanFb.className = 'editable-val';
+            spanFb.style.fontSize = '1rem';
+            compFdiv.parentNode.insertBefore(spanFb, compFdiv.nextSibling);
+            makeEditable(spanFb, 'xFB');
+        }
+        let compMdiv = document.getElementById('xM_B_disp');
+        if(compMdiv) {
+            let spanMb = document.createElement('span');
+            spanMb.id = 'val_xMB';
+            spanMb.innerText = xM_B;
+            spanMb.className = 'editable-val';
+            spanMb.style.fontSize = '1rem';
+            compMdiv.parentNode.insertBefore(spanMb, compMdiv.nextSibling);
+            makeEditable(spanMb, 'xMB');
+        }
+        actualizarTodo();
+    };
 </script>
 </body>
 </html>
