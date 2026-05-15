@@ -2,124 +2,71 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simulador Mezclador | Estilo Profesional</title>
+    <title>PFD - Mezclador de Gases | Simulador de Procesos</title>
     <style>
-        * { box-sizing: border-box; }
-        body {
-            background: #1a2a32;
-            font-family: 'Segoe UI', Roboto, sans-serif;
-            padding: 20px;
-            margin: 0;
-        }
-        .sim-card {
-            max-width: 1100px;
-            margin: 0 auto;
-            background: #eef2f5;
-            border-radius: 32px;
-            overflow: hidden;
-        }
-        .toolbar {
-            background: #0f212e;
-            padding: 12px 24px;
-            display: flex;
-            justify-content: space-between;
-        }
-        .flowsheet {
-            padding: 40px 20px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 25px;
-        }
-        .equipo-mezclador {
-            background: #cbdbe2;
-            border-radius: 60px;
-            padding: 20px;
-            min-width: 180px;
-            text-align: center;
-            box-shadow: inset 0 0 0 3px white, 0 5px 15px rgba(0,0,0,0.2);
-        }
-        .corriente {
-            background: white;
-            border-radius: 24px;
-            padding: 16px;
-            min-width: 180px;
-            text-align: center;
-            border-top: 4px solid #2e7d32;
-        }
-        .editable {
-            font-size: 1.6rem;
-            font-weight: bold;
-            background: #f4f9ff;
-            display: inline-block;
-            padding: 4px 12px;
-            border-radius: 28px;
-            cursor: pointer;
-        }
-        .result-panel {
-            background: #0f212e;
-            color: white;
-            margin: 20px;
-            border-radius: 28px;
-            padding: 16px;
-            text-align: center;
-        }
-        .btn-volver { background: #1e3a4a; padding: 6px 16px; border-radius: 30px; color: white; text-decoration: none; }
+        body { background: #2d3e4b; font-family: 'Segoe UI', monospace; padding: 20px; }
+        .pfd-box { max-width: 1200px; margin: 0 auto; background: #f5f7fa; border-radius: 16px; overflow: hidden; }
+        .header { background: #1a3a47; color: white; padding: 12px 24px; display: flex; justify-content: space-between; }
+        .pfd-area { background: #eef2f5; padding: 40px; background-image: linear-gradient(#c0cfdf 1px, transparent 1px), linear-gradient(90deg, #c0cfdf 1px, transparent 1px); background-size: 20px 20px; }
+        .layout { display: flex; align-items: center; justify-content: center; gap: 30px; flex-wrap: wrap; }
+        .equipo-mezcla { background: #7c9eb3; border-radius: 60px; padding: 30px; text-align: center; border: 3px solid #2c4c5c; min-width: 160px; box-shadow: 5px 5px 12px rgba(0,0,0,0.2); }
+        .corriente { background: white; border-radius: 20px; padding: 15px; min-width: 180px; border-left: 6px solid #1a5a6e; }
+        .editable-num { font-size: 1.8rem; font-weight: bold; background: #f0f4fa; display: inline-block; padding: 5px 12px; border-radius: 30px; cursor: pointer; border: 1px solid #ccc; }
+        table { width: 90%; margin: 20px auto; border-collapse: collapse; background: white; border-radius: 12px; overflow: hidden; }
+        th { background: #2c5a6e; color: white; padding: 10px; }
+        td { border: 1px solid #bdc4cc; padding: 8px; text-align: center; }
+        .btn-volver { background: #2d5a6e; padding: 5px 14px; border-radius: 20px; color: white; text-decoration: none; }
     </style>
 </head>
 <body>
-<div class="sim-card">
-    <div class="toolbar">
-        <div><strong style="color:white;">🧪 MEZCLADOR DE GASES (N₂ + H₂)</strong></div>
-        <a href="simuladores.html" class="btn-volver">← Volver</a>
-    </div>
-    <div class="flowsheet">
-        <div class="corriente">
-            <div>📥 N₂</div>
-            <div><span class="editable" id="n2_edit">280</span> <span style="font-size:0.8rem;">kg/h</span></div>
-            <div style="font-size:0.7rem;">M = 28 kg/kmol</div>
-        </div>
-        <div class="equipo-mezclador">
-            <div style="font-weight:bold;">⚙️ MEZCLADOR</div>
-            <div style="font-size:12px;">estado estacionario</div>
-        </div>
-        <div class="corriente">
-            <div>📤 SALIDA C</div>
-            <div><span class="editable" id="salida_edit">40</span> <span style="font-size:0.8rem;">kgmol/h</span></div>
+<div class="pfd-box">
+    <div class="header"><h1>🧪 PFD - MEZCLADOR DE GASES (N₂ + H₂)</h1><a href="simuladores.html" class="btn-volver">← Volver</a></div>
+    <div class="pfd-area">
+        <div class="layout">
+            <div class="corriente"><div>📥 CORRIENTE A (N₂)</div><div class="editable-num" id="n2_kg_edit">280</div><div>kg/h</div><div style="font-size:0.7rem;">M=28 kg/kmol</div></div>
+            <div class="flecha" style="font-size:28px;">⟶</div>
+            <div class="equipo-mezcla"><strong>MIX-101</strong><br>MEZCLADOR<br>⚙️</div>
+            <div class="flecha" style="font-size:28px;">⟶</div>
+            <div class="corriente"><div>📤 CORRIENTE C</div><div class="editable-num" id="salida_kmol_edit">40</div><div>kgmol/h</div></div>
         </div>
     </div>
-    <div class="result-panel" id="resultados">
-        🔄 Cálculo automático ...
-    </div>
+    <table id="tabla_resultados">
+        <thead><tr><th>Corriente</th><th>Caudal (kgmol/h)</th><th>Composición (fracción molar)</th></tr></thead>
+        <tbody>
+            <tr><td>N₂ entrada</td><td id="n2_kmol_td">---</td><td id="comp_n2">---</td></tr>
+            <tr><td>H₂ entrada (calculado)</td><td id="h2_kmol_td">---</td><td id="comp_h2">---</td></tr>
+            <tr><td>Mezcla C salida</td><td id="c_kmol_td">---</td><td id="comp_c">---</td></tr>
+        </tbody>
+    </table>
+    <div style="background:#1a3a47; color:#ffd966; padding:10px; text-align:center;" id="msg_mezclador">✔️ Simulación activa. Editá valores haciendo click.</div>
 </div>
 <script>
     function actualizarMezclador() {
-        let n2_kg = parseFloat(document.getElementById('n2_edit').innerText);
-        let salida_kmol = parseFloat(document.getElementById('salida_edit').innerText);
+        let n2_kg = parseFloat(document.getElementById('n2_kg_edit').innerText);
+        let salida_kmol = parseFloat(document.getElementById('salida_kmol_edit').innerText);
         if(isNaN(n2_kg)) n2_kg = 280;
         if(isNaN(salida_kmol)) salida_kmol = 40;
         let n2_kmol = n2_kg / 28;
         let h2_kmol = salida_kmol - n2_kmol;
-        let yH2 = h2_kmol / salida_kmol;
+        let yH2 = (h2_kmol / salida_kmol);
         let yN2 = 1 - yH2;
-        document.getElementById('resultados').innerHTML = `
-            <strong>📊 RESULTADOS</strong><br>
-            ⚛️ N₂ entrada: ${n2_kmol.toFixed(2)} kgmol/h &nbsp;|&nbsp;
-            💧 H₂ necesario: ${h2_kmol.toFixed(2)} kgmol/h <br>
-            🧪 Fracción molar H₂: ${yH2.toFixed(4)} &nbsp;|&nbsp; Fracción N₂: ${yN2.toFixed(4)}
-            ${h2_kmol<0 ? '<br><span style="color:#ffaa66;">⚠️ H₂ negativo: reducir flujo N₂ o aumentar salida</span>' : ''}
-        `;
+        document.getElementById('n2_kmol_td').innerHTML = n2_kmol.toFixed(3);
+        document.getElementById('h2_kmol_td').innerHTML = h2_kmol.toFixed(3);
+        document.getElementById('c_kmol_td').innerHTML = salida_kmol.toFixed(1);
+        document.getElementById('comp_n2').innerHTML = `yN₂ = ${yN2.toFixed(4)}`;
+        document.getElementById('comp_h2').innerHTML = `yH₂ = ${yH2.toFixed(4)}`;
+        document.getElementById('comp_c').innerHTML = `N₂:${yN2.toFixed(3)} | H₂:${yH2.toFixed(3)}`;
+        let msg = (h2_kmol>=0) ? "✅ Balance OK" : "⚠️ H₂ negativo: reducir N₂ o aumentar salida";
+        document.getElementById('msg_mezclador').innerHTML = msg;
     }
-    function makeEditableSpan(spanId, callback) {
+    function makeEditable(spanId) {
         let span = document.getElementById(spanId);
         span.setAttribute('contenteditable','true');
         span.style.cursor = 'pointer';
-        span.addEventListener('blur', () => { callback(); });
+        span.addEventListener('blur', actualizarMezclador);
     }
-    makeEditableSpan('n2_edit', actualizarMezclador);
-    makeEditableSpan('salida_edit', actualizarMezclador);
+    makeEditable('n2_kg_edit');
+    makeEditable('salida_kmol_edit');
     actualizarMezclador();
 </script>
 </body>

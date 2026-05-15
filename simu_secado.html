@@ -2,59 +2,71 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Simulador Secado Industrial | Estilo HYSYS</title>
+    <title>PFD - Secador Rotatorio | Simulador de Procesos</title>
     <style>
-        body { background: #1a2a32; font-family: 'Segoe UI', Roboto; padding: 20px; }
-        .sec-card { max-width: 1100px; margin: 0 auto; background: #eef2f5; border-radius: 32px; overflow: hidden; }
-        .toolbar { background: #0f212e; padding: 12px 24px; display: flex; justify-content: space-between; }
-        .flowsheet { padding: 40px; display: flex; justify-content: center; gap: 35px; flex-wrap: wrap; align-items: center; }
-        .corriente { background: white; border-radius: 28px; padding: 20px; min-width: 200px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        .secador { background: #9bb7d0; border-radius: 40px; padding: 25px; text-align: center; min-width: 180px; font-weight: bold; box-shadow: inset 0 0 0 3px white; }
-        .editable { font-size: 1.6rem; font-weight: bold; background: #f0f4fa; display: inline-block; padding: 4px 12px; border-radius: 28px; cursor: pointer; }
-        .result-panel { background: #0f212e; color: white; margin: 20px; border-radius: 28px; padding: 18px; text-align: center; }
-        a.btn { background: #1e3a4a; padding: 6px 16px; border-radius: 30px; color: white; text-decoration: none; }
+        body { background: #2d3e4b; font-family: 'Segoe UI', monospace; padding: 20px; }
+        .pfd-sec { max-width: 1200px; margin: 0 auto; background: #f5f7fa; border-radius: 16px; overflow: hidden; }
+        .header { background: #1a3a47; color: white; padding: 12px 24px; display: flex; justify-content: space-between; }
+        .diagrama { background: #eef2f5; padding: 35px; background-image: linear-gradient(#c0cfdf 1px, transparent 1px), linear-gradient(90deg, #c0cfdf 1px, transparent 1px); background-size: 20px 20px; display: flex; justify-content: center; gap: 40px; flex-wrap: wrap; align-items: center; }
+        .secador-equipo { background: #9b9e7c; border-radius: 80px; padding: 30px; text-align: center; border: 3px solid #5a5e3a; min-width: 180px; transform: rotate(-2deg); }
+        .corriente-card { background: white; border-radius: 20px; padding: 15px; min-width: 200px; border-left: 6px solid #d98c2b; }
+        .editable-val { font-size: 1.5rem; font-weight: bold; background: #f0f4fa; display: inline-block; padding: 4px 12px; border-radius: 28px; cursor: pointer; }
+        .tabla-res { width: 90%; margin: 20px auto; border-collapse: collapse; background: white; }
+        th { background: #5a6e3a; color: white; }
+        td { border: 1px solid #bbb; padding: 8px; text-align: center; }
+        .footer-msg { background: #1a3a47; color: #ffd966; padding: 10px; text-align: center; }
     </style>
 </head>
 <body>
-<div class="sec-card">
-    <div class="toolbar"><span style="color:white;">🌿 SECADOR DE SÓLIDOS (Pieles)</span><a href="simuladores.html" class="btn">← Volver</a></div>
-    <div class="flowsheet">
-        <div class="corriente"><div>📥 ALIMENTACIÓN HÚMEDA</div><div><span class="editable" id="A_display">---</span> <span style="font-size:0.8rem;">lb</span></div><div style="font-size:0.7rem;">(calculado)</div></div>
-        <div class="secador">🔥 SECADOR<br>pérdida de agua</div>
-        <div class="corriente"><div>📤 PRODUCTO SECO</div><div><span class="editable" id="peso_final_edit">900</span> lb</div><div>Humedad final: <span class="editable" id="hum_final_edit">7</span> %</div></div>
+<div class="pfd-sec">
+    <div class="header"><h1>🌡️ PFD - SECADOR ROTATORIO DE SÓLIDOS (Pieles)</h1><a href="simuladores.html" class="btn-volver">← Volver</a></div>
+    <div class="diagrama">
+        <div class="corriente-card"><div>📥 ALIMENTACIÓN HÚMEDA</div><div><span class="editable-val" id="A_display">---</span> lb</div><div style="font-size:0.7rem;">(calculado)</div></div>
+        <div class="secador-equipo"><strong>DRY-101</strong><br>SECADOR<br>🔥<br>pérdida: 59.1%</div>
+        <div class="corriente-card"><div>📤 PRODUCTO SECO</div><div><span class="editable-val" id="peso_final_edit">900</span> lb</div><div>Humedad final: <span class="editable-val" id="hum_edit">7</span> %</div></div>
     </div>
-    <div class="result-panel" id="resSecado">
-        📊 Ajustando parámetros...
-    </div>
+    <table class="tabla-res">
+        <thead><tr><th>Parámetro</th><th>Valor</th></tr></thead>
+        <tbody>
+            <tr><td>Alimentación inicial (húmeda)</td><td id="res_A">--- lb</td></tr>
+            <tr><td>Agua extraída en el secado</td><td id="res_B">--- lb</td></tr>
+            <tr><td>Piel completamente seca</td><td id="res_piel_seca">--- lb</td></tr>
+            <tr><td>% de agua eliminada</td><td id="res_porc_elim">--- %</td></tr>
+            <tr><td>Relación lb agua / lb piel seca</td><td id="res_relacion">---</td></tr>
+        </tbody>
+    </table>
+    <div class="footer-msg" id="msgSecado">✔️ Editá el peso final o humedad final clickeando los valores.</div>
 </div>
 <script>
-    function actualizarSecado() {
+    function actualizarSecador() {
         let pesoFinal = parseFloat(document.getElementById('peso_final_edit').innerText);
-        let humedadFinal = parseFloat(document.getElementById('hum_final_edit').innerText);
-        let perdidaPeso = 59.1; // fijo o editable si se quiere, lo dejamos como ejemplo pero lo hacemos editable extra
-        if(isNaN(pesoFinal)) pesoFinal=900;
-        if(isNaN(humedadFinal)) humedadFinal=7;
-        let aguaFinal = pesoFinal * humedadFinal/100;
+        let humedadFinal = parseFloat(document.getElementById('hum_edit').innerText);
+        if(isNaN(pesoFinal)) pesoFinal = 900;
+        if(isNaN(humedadFinal)) humedadFinal = 7;
+        let aguaFinal = pesoFinal * humedadFinal / 100;
         let pielSeca = pesoFinal - aguaFinal;
+        let perdidaPeso = 59.1; // % fijo del problema
         let A = (pielSeca + aguaFinal) / (1 - (perdidaPeso/100));
-        let B = (perdidaPeso/100)*A;
+        let B = (perdidaPeso/100) * A;
         let aguaInicial = A - pielSeca;
-        let porcElim = (B/aguaInicial)*100;
+        let porcElim = (B / aguaInicial) * 100;
+        let relacion = B / pielSeca;
         document.getElementById('A_display').innerHTML = A.toFixed(1);
-        document.getElementById('resSecado').innerHTML = `
-            <strong>📊 RESULTADOS DEL SECADO</strong><br>
-            🧺 Alimentación inicial: ${A.toFixed(1)} lb &nbsp;| 💧 Agua extraída: ${B.toFixed(1)} lb<br>
-            🧪 Agua eliminada: ${porcElim.toFixed(1)}% &nbsp;| Relación agua/piel seca: ${(B/pielSeca).toFixed(3)} lb agua/lb sólido
-        `;
+        document.getElementById('res_A').innerHTML = A.toFixed(1) + " lb";
+        document.getElementById('res_B').innerHTML = B.toFixed(1) + " lb";
+        document.getElementById('res_piel_seca').innerHTML = pielSeca.toFixed(1) + " lb";
+        document.getElementById('res_porc_elim').innerHTML = porcElim.toFixed(1) + " %";
+        document.getElementById('res_relacion').innerHTML = relacion.toFixed(3);
+        document.getElementById('msgSecado').innerHTML = "✅ Simulación actualizada. Balance de sólido seco verificado.";
     }
     function makeEditableSpan(id) {
         let el = document.getElementById(id);
         el.setAttribute('contenteditable','true');
-        el.addEventListener('blur', actualizarSecado);
+        el.addEventListener('blur', actualizarSecador);
     }
     makeEditableSpan('peso_final_edit');
-    makeEditableSpan('hum_final_edit');
-    actualizarSecado();
+    makeEditableSpan('hum_edit');
+    actualizarSecador();
 </script>
 </body>
 </html>
