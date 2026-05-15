@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, print-scale: 1.0">
+    <title>Balances de Materia | Fundamentos + Guía Python (Felder & Himmelblau)</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            line-height: 1.5;
+            background: #eef2f5;
+            padding: 2rem 1rem;
+            color: #1e2a3a;
+        }
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            background: white;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+            border-radius: 20px;
+            padding: 2rem 2rem 3rem;
+        }
+        h1 {
+            font-size: 2rem;
+            border-left: 6px solid #2c7da0;
+            padding-left: 1.2rem;
+            margin-bottom: 0.5rem;
+            color: #0b3b4f;
+        }
+        h2 {
+            font-size: 1.6rem;
+            margin-top: 2rem;
+            margin-bottom: 0.75rem;
+            color: #1f5068;
+            border-bottom: 2px solid #cbdbe2;
+            padding-bottom: 0.3rem;
+        }
+        h3 {
+            font-size: 1.3rem;
+            margin: 1.5rem 0 0.8rem 0;
+            color: #2c7da0;
+        }
+        .ref-box {
+            background: #eef2fa;
+            padding: 1rem 1.5rem;
+            border-radius: 16px;
+            margin: 1.2rem 0;
+            border-left: 5px solid #2c7da0;
+            font-size: 0.95rem;
+        }
+        .card-ejemplo {
+            background: #f9fafc;
+            border-left: 5px solid #2c7da0;
+            margin: 1.8rem 0;
+            padding: 1.2rem 1.5rem;
+            border-radius: 18px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+            break-inside: avoid;
+            page-break-inside: avoid;
+        }
+        .pasos {
+            background: #eef2fa;
+            padding: 0.8rem 1.2rem;
+            border-radius: 14px;
+            margin: 1rem 0;
+        }
+        .python-code {
+            background: #1e2a2f;
+            color: #e4f0fb;
+            padding: 1rem 1.2rem;
+            border-radius: 14px;
+            overflow-x: auto;
+            font-family: 'Fira Code', 'Courier New', monospace;
+            font-size: 0.85rem;
+            margin: 1rem 0;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+        .verificacion {
+            background: #e6f4ea;
+            border-left: 5px solid #2e7d32;
+            padding: 0.8rem 1.2rem;
+            border-radius: 12px;
+            margin: 1rem 0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+        th, td {
+            border: 1px solid #cbd5e1;
+            padding: 0.5rem;
+            text-align: center;
+        }
+        th {
+            background: #e2e8f0;
+        }
+        .nota {
+            font-size: 0.85rem;
+            color: #4a5b6e;
+            background: #fef9e3;
+            padding: 0.5rem 1rem;
+            border-radius: 12px;
+            margin-top: 1rem;
+        }
+        footer {
+            margin-top: 3rem;
+            text-align: center;
+            font-size: 0.8rem;
+            border-top: 1px solid #ccc;
+            padding-top: 1.5rem;
+            color: #5f6c7a;
+        }
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+                margin: 0;
+            }
+            .container {
+                box-shadow: none;
+                padding: 1rem;
+                max-width: 100%;
+            }
+            .python-code {
+                background: #f4f4f4;
+                color: black;
+                border: 1px solid #aaa;
+            }
+            .card-ejemplo {
+                break-inside: avoid;
+                page-break-inside: avoid;
+            }
+        }
+        .btn-copy {
+            background: #2c7da0;
+            color: white;
+            border: none;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            cursor: pointer;
+            float: right;
+            margin-top: -0.5rem;
+        }
+        .btn-copy:hover {
+            background: #1f5e7a;
+        }
+        .ecuacion {
+            font-family: monospace;
+            background: #f0f2f5;
+            padding: 0.2rem 0.4rem;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>⚖️ Balances de Materia en Ingeniería de Procesos</h1>
+    <p style="font-size: 1.1rem; margin-bottom: 0.5rem;">Fundamentos, metodología sistemática y verificación con Python.<br>Basado en <strong>Felder & Rousseau (2004)</strong> y <strong>Himmelblau (1997)</strong> – Procesos no reactivos en estado estacionario.</p>
+    
+    <!-- SECCIÓN DE FUNDAMENTOS Y CONTEXTO TEÓRICO -->
+    <div class="ref-box">
+        <strong>📚 Contexto y principios esenciales (Felder, Himmelblau):</strong><br>
+        • <strong>Ley de conservación de la masa:</strong> “La materia no se crea ni se destruye”. En procesos no reactivos sin acumulación: <span class="ecuacion">Entrada = Salida</span>.<br>
+        • <strong>Sistemas y fronteras:</strong> Un sistema puede ser abierto (transferencia de masa) o cerrado. Para análisis se define una frontera (volumen de control).<br>
+        • <strong>Procesos en estado estacionario:</strong> Las variables (flujos, composiciones, temperatura) no cambian en el tiempo ⇒ Acumulación = 0.<br>
+        • <strong>Balance total y por componentes:</strong> Se escribe un balance para cada especie química presente. Suma de fracciones másicas o molares = 1.<br>
+        • <strong>Grados de libertad:</strong> Número de variables desconocidas menos ecuaciones independientes. Para resolver un problema se requiere G.L. = 0.<br>
+        • <strong>Metodología propuesta por Felder:</strong> 1) Leer/diagramar, 2) Etiquetar corrientes, 3) Elegir base de cálculo, 4) Escribir balances, 5) Resolver, 6) Verificar.<br>
+        • <strong>Importancia en ingeniería:</strong> Los balances de materia son la base del diseño, simulación y optimización de procesos químicos y biotecnológicos.
+    </div>
+
+    <h2>📐 Procedimiento sistemático para resolver balances (no reactivos)</h2>
+    <div class="pasos" style="background: #e9ecef;">
+        <strong>✅ Paso a paso (adaptado de Felder & Rousseau, Cap. 4):</strong><br>
+        1. <strong>Interpretar el problema</strong>: identificar datos explícitos e implícitos, y las incógnitas.<br>
+        2. <strong>Dibujar diagrama de flujo</strong>: representar equipos, corrientes y composiciones conocidas. Usar símbolos para incógnitas.<br>
+        3. <strong>Elegir base de cálculo</strong>: tiempo (ej. 1 hora) o masa (ej. 100 kg), que facilite los cálculos.<br>
+        4. <strong>Analizar grados de libertad</strong>: comparar número de incógnitas vs. ecuaciones independientes (balances más relaciones auxiliares).<br>
+        5. <strong>Plantear ecuaciones</strong>: balance global (<em>total mass in = total mass out</em>) y balances por componente.<br>
+        6. <strong>Resolver el sistema</strong>: algebraico, sustitución o métodos matriciales.<br>
+        7. <strong>Verificar</strong> usando un balance no utilizado o chequeo de consistencia (fracciones suman 1).<br>
+        💡 <em>Nota: Los ejemplos siguientes aplican esta metodología; luego se incluye código Python para comprobación rápida.</em>
+    </div>
+
+    <!-- ======================== EJEMPLOS ILUSTRATIVOS ======================== -->
+    
+    <!-- EJEMPLO 3.1 (Mezcla N2/H2) -->
+    <div class="card-ejemplo">
+        <h3>📌 Ejemplo 3.1 – Mezcla de N₂ e H₂ (Felder tipo)</h3>
+        <p><strong>Enunciado:</strong> Una corriente de 280 kg/h de N₂ se mezcla con H₂ puro. La corriente de salida total es 40 kgmol/h. Calcular el flujo de H₂ en kgmol/h y la composición molar de la mezcla final.</p>
+        <div class="pasos">
+            <strong>✍️ Solución manual paso a paso:</strong><br>
+            • <strong>Base:</strong> 1 hora. Convertir N₂ a kgmol: (280 kg) / (28 kg/kgmol) = 10 kgmol/h.<br>
+            • <strong>Balance global:</strong> N₂ + H₂ = Total salida → 10 + B = 40 ⇒ B = 30 kgmol/h de H₂.<br>
+            • <strong>Balance por componente (H₂):</strong> B·1 = 40·y<sub>C,H₂</sub> ⇒ y<sub>C,H₂</sub> = 30/40 = 0.75, y<sub>C,N₂</sub> = 0.25.<br>
+            • <strong>Verificación N₂:</strong> 10 = 40·0.25 ✔️.
+        </div>
+        <div class="verificacion">
+            <strong>🐍 Verificación con Python (cálculo numérico):</strong>
+            <button class="btn-copy" onclick="copyToClipboard('code31')">📋 Copiar código</button>
+            <div id="code31" class="python-code">
+# Ejemplo 3.1 - Mezclador simple
+flujo_N2_kg = 280
+M_N2 = 28
+flujo_N2_kmol = flujo_N2_kg / M_N2   # 10 kmol/h
+C_total_kmol = 40                    # kmol/h salida
+B_kmol = C_total_kmol - flujo_N2_kmol   # H2
+yH2 = B_kmol / C_total_kmol
+yN2 = 1 - yH2
+print(f"H₂ en entrada: {B_kmol} kgmol/h")
+print(f"Fracción molar H₂ = {yH2:.3f}, N₂ = {yN2:.3f}")
+# Resultados: 30 kgmol/h, yH2=0.750, yN2=0.250
+            </div>
+        </div>
+    </div>
+
+    <!-- EJEMPLO 3.2 Columna destilación (3 componentes) -->
+    <div class="card-ejemplo">
+        <h3>📌 Ejemplo 3.2 – Destilación con tres componentes (Himmelblau)</h3>
+        <p><strong>Datos:</strong> F=32 kg/h (12.5% B, 87.5% C), T=28 kg/h (100% A), M=35 kg/h (28.6% B), desconocidas E, D, composición de M (% A). Hallar E, D, x<sub>M,A</sub>.</p>
+        <div class="pasos">
+            <strong>✍️ Metodología:</strong><br>
+            • Balance global: 32 + E = 28 + 35 + D → E - D = 31  (1)<br>
+            • Balance componente B: 32·0.125 + E·0.466 = 35·0.286 + D·0.614 → 0.466E - 0.614D = 6.01  (2)<br>
+            • Resolver: de (1) E = D+31; sustituir: 0.466(D+31) - 0.614D = 6.01 → D = 57 kg, E = 88 kg.<br>
+            • Balance A: 88·0.534 = 28·1 + 35·x<sub>M,A</sub> → x<sub>M,A</sub> = 0.543, luego x<sub>M,C</sub> = 0.171.
+        </div>
+        <div class="verificacion">
+            <strong>🐍 Solución con NumPy:</strong>
+            <button class="btn-copy" onclick="copyToClipboard('code32')">📋 Copiar código</button>
+            <div id="code32" class="python-code">
+import numpy as np
+# Sistema para E y D:  E - D = 31 ; 0.466E - 0.614D = 6.01
+A_mat = np.array([[1, -1], [0.466, -0.614]])
+b_vec = np.array([31, 6.01])
+E, D = np.linalg.solve(A_mat, b_vec)
+x_MA = (E*0.534 - 28) / 35
+x_MC = 1 - 0.286 - x_MA
+print(f"E = {E:.1f} kg/h, D = {D:.1f} kg/h")
+print(f"x_MA = {x_MA:.3f}, x_MC = {x_MC:.3f}")
+            </div>
+        </div>
+    </div>
+
+    <!-- EJEMPLO 3.3 Secado de pieles -->
+    <div class="card-ejemplo">
+        <h3>📌 Ejemplo 3.3 – Secado (pérdida de humedad)</h3>
+        <p><strong>Planteamiento:</strong> Piel salida = 900 lb con 7% humedad → piel seca = 837 lb. Durante secado se perdió 59.1% del peso inicial. Calcular A (alimentación húmeda), agua extraída, % eliminación.</p>
+        <div class="pasos">
+            <strong>✍️ Solución:</strong><br>
+            • Piel seca: A·(1 - x<sub>A,agua</sub>) = 837. Balance agua: A·x<sub>A,agua</sub> = 0.591A + 900·0.07 = 0.591A + 63.<br>
+            • Además A·x<sub>A,agua</sub> = A - 837 → A - 837 = 0.591A + 63 → 0.409A = 900 → A = 2200 lb.<br>
+            • Agua eliminada B = 0.591*2200 = 1300 lb; agua inicial = 1363 lb; % eliminado = 95.6%.<br>
+            • Agua por lb piel seca = 1300/837 = 1.553.
+        </div>
+        <div class="verificacion">
+            <strong>🐍 Código de verificación:</strong>
+            <button class="btn-copy" onclick="copyToClipboard('code33')">📋 Copiar código</button>
+            <div id="code33" class="python-code">
+C = 900
+xC_agua = 0.07
+piel_seca = C * (1 - xC_agua)   # 837 lb
+# A - 0.591A = piel_seca + C*xC_agua
+A = (piel_seca + C*xC_agua) / (1 - 0.591)
+B = 0.591 * A
+agua_inicial = A - piel_seca
+porc_elim = B / agua_inicial * 100
+agua_por_lb_seca = B / piel_seca
+print(f"Alimentación A = {A:.1f} lb, Agua extraída B = {B:.1f} lb")
+print(f"% agua eliminada = {porc_elim:.1f}%, lb agua/lb piel seca = {agua_por_lb_seca:.3f}")
+            </div>
+        </div>
+    </div>
+
+    <!-- EJEMPLO 3.4 Proceso múltiples unidades -->
+    <div class="card-ejemplo">
+        <h3>📌 Ejemplo 3.4 – Dos unidades de separación (balances secuenciales)</h3>
+        <p><strong>Descripción:</strong> Corrientes E=100 kg (50% A), F=40 kg (90% A), H=30 kg (30% A), N=30 kg (60% A). Encontrar G, M, P, x<sub>G,A</sub>, x<sub>P,A</sub>, x<sub>M,A</sub>.</p>
+        <div class="pasos">
+            <strong>✍️ Solución escalonada:</strong><br>
+            • Unidad 1: 100 = 40 + G → G = 60 kg; Balance A: 100·0.5 = 40·0.9 + 60·x<sub>G,A</sub> → x<sub>G,A</sub> = 0.2333.<br>
+            • Global sistema: 100+30 = 40+30+P → P = 60 kg; Balance A global: 100·0.5+30·0.3 = 40·0.9+30·0.6+60·x<sub>P,A</sub> → x<sub>P,A</sub>=0.08333.<br>
+            • Punto mezcla M: M = N+P = 90 kg; x<sub>M,A</sub> = (30·0.6+60·0.08333)/90 = 0.2556.
+        </div>
+        <div class="verificacion">
+            <strong>🐍 Python secuencial:</strong>
+            <button class="btn-copy" onclick="copyToClipboard('code34')">📋 Copiar código</button>
+            <div id="code34" class="python-code">
+E, xE_A = 100, 0.5
+F, xF_A = 40, 0.9
+H, xH_A = 30, 0.3
+N, xN_A = 30, 0.6
+G = E - F
+xG_A = (E*xE_A - F*xF_A)/G
+P = E + H - F - N
+xP_A = (E*xE_A + H*xH_A - F*xF_A - N*xN_A)/P
+M = N + P
+xM_A = (N*xN_A + P*xP_A)/M
+print(f"G={G} kg, xG_A={xG_A:.4f}; P={P} kg, xP_A={xP_A:.5f}")
+print(f"M={M} kg, xM_A={xM_A:.4f}")
+            </div>
+        </div>
+    </div>
+
+    <!-- EJEMPLO 3.5 Separación dos etapas (xileno, benceno, tolueno) -->
+    <div class="card-ejemplo">
+        <h3>📌 Ejemplo 3.5 – Separación fraccionada con 3 componentes</h3>
+        <p><strong>Condiciones:</strong> F=855 kg/h (20% X, 40% B, 40% T). D con 90% X, A con 99% B, C con 5% B. Determinar A, C, D, B y composición de B.</p>
+        <div class="pasos">
+            <strong>✍️ Resolución:</strong><br>
+            • Balance Xileno global: 855·0.2 = D·0.90 → D = 190 kg.<br>
+            • Balance Benceno global: 342 = 0.99A + 0.05C, y global total: A + C = 855-190 = 665 → A=328.46, C=336.54.<br>
+            • Unidad 1: B = F - A = 527 kg; x<sub>B,X</sub> = (855*0.2)/527 = 0.324; x<sub>B,B</sub> = (342-328.46*0.99)/527 = 0.0328; x<sub>B,T</sub> = 1 - 0.324 - 0.0328 = 0.643.
+        </div>
+        <div class="verificacion">
+            <strong>🐍 Con SymPy para mayor claridad:</strong>
+            <button class="btn-copy" onclick="copyToClipboard('code35')">📋 Copiar código</button>
+            <div id="code35" class="python-code">
+from sympy import symbols, solve
+F, xF_X, xF_B = 855, 0.2, 0.4
+xD_X = 0.9; xA_B = 0.99; xC_B = 0.05
+D = (F * xF_X) / xD_X   # 190
+A, C = symbols('A C')
+eq1 = A + C - (F - D)
+eq2 = 0.99*A + 0.05*C - F*xF_B
+sol = solve((eq1, eq2), (A, C))
+A_val = float(sol[A]); C_val = float(sol[C])
+B = F - A_val
+xBX = (F*xF_X) / B
+xBB = (F*xF_B - A_val*xA_B) / B
+xBT = 1 - xBX - xBB
+print(f"A={A_val:.1f} kg, C={C_val:.1f} kg, D={D:.1f} kg, B={B:.1f} kg")
+print(f"x_B,X={xBX:.3f}, x_B,B={xBB:.4f}, x_B,T={xBT:.3f}")
+            </div>
+        </div>
+    </div>
+
+    <!-- EJEMPLO 3.6 Recirculación (cristalizador) -->
+    <div class="card-ejemplo">
+        <h3>📌 Ejemplo 3.6 – Proceso con recirculación (ejemplo clásico Himmelblau)</h3>
+        <p><strong>Datos:</strong> F=10000 lb/h, 20% KNO₃, alimentación a evaporador. R: disolución saturada (0.6 lb KNO₃/lb H₂O → xR=0.375). Cristales C con 96% KNO₃. Corriente M 50% KNO₃. Calcular R, M, W, E y composición de E.</p>
+        <div class="pasos">
+            <strong>✍️ Estrategia:</strong><br>
+            • Balance global de KNO₃: 10000·0.2 = C·0.96 → C = 2083.33 lb; luego W = F - C = 7916.67 lb.<br>
+            • Cristalizador: M = R + C; Balance KNO₃: 0.5M = 0.96C + 0.375R → 0.5(R+C)=0.96C+0.375R → R = 7666.67 lb, M = 9750 lb.<br>
+            • Mezcla E = F + R = 17666.67 lb; x<sub>E,H2O</sub> = (10000·0.8 + 7666.67·0.625)/E = 0.724, x<sub>E,KNO3</sub>=0.276.
+        </div>
+        <div class="verificacion">
+            <strong>🐍 Código de verificación:</strong>
+            <button class="btn-copy" onclick="copyToClipboard('code36')">📋 Copiar código</button>
+            <div id="code36" class="python-code">
+F = 10000
+xF_KNO3 = 0.2
+xC_KNO3 = 0.96
+xR_KNO3 = 0.375
+xM_KNO3 = 0.5
+C = (F * xF_KNO3) / xC_KNO3
+W = F - C
+# Cristalizador: 0.5(R+C) = 0.96*C + 0.375*R
+R = (0.96*C - 0.5*C) / (0.5 - 0.375)
+M = R + C
+E = F + R
+xE_H2O = (F*0.8 + R*0.625) / E
+print(f"C={C:.2f} lb/h, W={W:.2f} lb/h, R={R:.2f} lb/h, M={M:.2f} lb/h")
+print(f"E={E:.2f} lb/h, xE_H2O={xE_H2O:.4f}, xE_KNO3={1-xE_H2O:.4f}")
+            </div>
+        </div>
+    </div>
+
+    <!-- EJERCICIO DE PRÁCTICA mezcla etanol-agua -->
+    <div class="card-ejemplo">
+        <h3>📌 Ejercicio de práctica – Mezcla Etanol/Agua (Felder & Rousseau 4.2)</h3>
+        <p><strong>Planteamiento:</strong> Corriente A (30% etanol) + Corriente B (60% etanol) producen C al 35% etanol. a) Determinar relación A/B. b) Si C=4500 kg/h, calcular A y B.</p>
+        <div class="pasos">
+            <strong>✍️ Solución analítica:</strong><br>
+            • Balance etanol: 0.3A + 0.6B = 0.35(A+B) → 0.3A+0.6B = 0.35A+0.35B → 0.25B = 0.05A → A/B = 5.<br>
+            • Relación independiente del caudal. Para C=4500: A = (5/6)*4500 = 3750 kg/h, B = 750 kg/h.
+        </div>
+        <div class="verificacion">
+            <strong>🐍 Cálculo Python:</strong>
+            <button class="btn-copy" onclick="copyToClipboard('code37')">📋 Copiar código</button>
+            <div id="code37" class="python-code">
+relacion_AB = 5
+C_masa = 4500
+A = (relacion_AB / (1 + relacion_AB)) * C_masa
+B = C_masa - A
+print(f"Relación A/B = {relacion_AB}")
+print(f"Para C = {C_masa} kg/h -> A = {A:.1f} kg/h, B = {B:.1f} kg/h")
+# Comprobación: 0.3*3750+0.6*750 = 1575 kg etanol, C*0.35=1575 ✔️
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabla resumen de ecuaciones fundamentales -->
+    <h2>📊 Resumen de ecuaciones clave (procesos no reactivos, E.E.)</h2>
+    <table>
+        <thead>
+            <tr><th>Concepto</th><th>Ecuación</th><th>Aplicación típica</th></tr>
+        </thead>
+        <tbody>
+            <tr><td>Balance global</td><td>Σ m_entrada = Σ m_salida</td><td>Sistema completo o unidad</td></tr>
+            <tr><td>Balance por componente</td><td>Σ (m_i · x_i,ent) = Σ (m_j · x_j,sal)</td><td>Cada especie química</td></tr>
+            <tr><td>Fracción másica/molar</td><td>Σ x_k = 1</td><td>Verificación de consistencia</td></tr>
+            <tr><td>Grados de libertad</td><td>GL = N° incógnitas - N° ec. independientes</td><td>Determinar si el problema está bien especificado</td></tr>
+        </tbody>
+    </table>
+
+    <div class="nota">
+        <strong>📖 Referencias teóricas:</strong><br>
+        • Felder, R. M. & Rousseau, R. W. (2004). <em>Principios elementales de los procesos químicos</em> (3ª ed.). Wiley. Capítulos 4 y 5 (balances de materia sin reacción).<br>
+        • Himmelblau, D. M. (1997). <em>Principios básicos y cálculos en ingeniería química</em> (6ª ed.). Prentice Hall. Capítulo 4: Balances de materia.<br>
+        • La metodología presentada sigue el enfoque de «análisis de grados de libertad» y resolución sistemática propuesto por ambos autores.
+    </div>
+    
+    <footer>
+        Guía didáctica para cursos de Procesos Químicos / Ingeniería de Sistemas.<br>
+        Los ejemplos fueron resueltos manualmente siguiendo los fundamentos de Felder y Himmelblau; el código Python permite verificar resultados y aprender programación aplicada.
+    </footer>
+</div>
+
+<script>
+function copyToClipboard(elementId) {
+    const codeBlock = document.getElementById(elementId);
+    const text = codeBlock.innerText;
+    navigator.clipboard.writeText(text).then(() => {
+        alert("✅ Código Python copiado al portapapeles");
+    }).catch(err => {
+        console.error("Error al copiar: ", err);
+    });
+}
+</script>
+</body>
+</html>
