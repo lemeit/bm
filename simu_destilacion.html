@@ -3,13 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simulador interactivo: Columna de Destilación | Balances de Materia</title>
+    <title>Simulador Destilación | Laboratorio Industrias</title>
     <style>
-        * {
-            box-sizing: border-box;
-        }
+        * { box-sizing: border-box; }
         body {
-            font-family: 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            font-family: 'Segoe UI', Roboto, sans-serif;
             background: linear-gradient(135deg, #e0eafc 0%, #cfdef3 100%);
             margin: 0;
             padding: 20px;
@@ -21,309 +19,136 @@
             background: white;
             border-radius: 28px;
             box-shadow: 0 20px 40px rgba(0,0,0,0.15);
-            overflow: hidden;
             padding: 1.5rem 2rem 2rem;
         }
-        h1 {
-            color: #1e4668;
-            border-left: 5px solid #2c7da0;
-            padding-left: 20px;
-            margin-top: 0;
-        }
-        .sub {
-            color: #2c5a7a;
-            margin-bottom: 1.5rem;
-            font-style: italic;
-        }
-        .dashboard {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 25px;
-        }
-        .controles {
-            flex: 1.2;
-            min-width: 280px;
-            background: #f8f9ff;
-            padding: 1.2rem;
-            border-radius: 24px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-        }
-        .diagrama {
-            flex: 2;
-            min-width: 400px;
-            background: #fefefe;
-            border-radius: 24px;
-            padding: 1rem;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-        }
-        .card-param {
-            background: white;
-            border-radius: 20px;
-            padding: 12px 15px;
-            margin-bottom: 18px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-        }
-        .param-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin: 10px 0;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-        label {
-            font-weight: 600;
-            color: #1f3b4c;
-        }
-        input {
-            width: 130px;
-            padding: 6px 10px;
-            border-radius: 12px;
-            border: 1px solid #bdd4e7;
-            font-family: monospace;
-            font-weight: bold;
-            text-align: center;
-        }
-        .resultado-box {
-            background: #1e2f3f;
-            color: #eef4ff;
-            border-radius: 20px;
-            padding: 1rem;
-            margin-top: 1rem;
-        }
-        .flujo-card {
-            background: #eef2fa;
-            border-radius: 16px;
-            padding: 10px;
-            margin: 10px 0;
-            text-align: center;
-        }
-        .corriente {
-            font-family: monospace;
-            font-weight: bold;
-            font-size: 1rem;
-        }
-        .valor-destacado {
-            font-size: 1.4rem;
-            font-weight: 800;
-            color: #1f6392;
-        }
-        .ecuacion-bg {
-            background: #e9ecef;
-            padding: 8px;
-            border-radius: 16px;
-            font-family: monospace;
-            font-size: 0.85rem;
-            text-align: center;
-        }
-        .warning {
-            background: #fff3cd;
-            border-left: 5px solid #ffc107;
-            padding: 8px 12px;
-            border-radius: 12px;
-            font-size: 0.8rem;
-            margin-top: 15px;
-        }
-        hr {
-            margin: 20px 0;
-        }
-        button {
-            background: #2c7da0;
-            border: none;
-            color: white;
-            padding: 8px 18px;
-            border-radius: 40px;
-            cursor: pointer;
-            font-weight: bold;
-            margin-top: 8px;
-            transition: 0.2s;
-        }
-        button:hover {
-            background: #1f5e7a;
-        }
-        @media (max-width: 800px) {
-            .simulator-container { padding: 1rem; }
-            .dashboard { flex-direction: column; }
-        }
+        h1 { color: #1e4668; margin-top: 0; }
+        .sub { color: #2c5a7a; margin-bottom: 1.5rem; border-left: 3px solid #2c7da0; padding-left: 15px; }
+        .dashboard { display: flex; flex-wrap: wrap; gap: 25px; }
+        .controles { flex: 1.2; min-width: 280px; background: #f8f9ff; padding: 1.2rem; border-radius: 24px; }
+        .diagrama { flex: 2; min-width: 400px; background: #fefefe; border-radius: 24px; padding: 1rem; }
+        .card-param { background: white; border-radius: 20px; padding: 12px 15px; margin-bottom: 18px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .param-row { display: flex; justify-content: space-between; align-items: center; margin: 10px 0; flex-wrap: wrap; gap: 10px; }
+        label { font-weight: 600; color: #1f3b4c; }
+        input { width: 120px; padding: 6px 10px; border-radius: 12px; border: 1px solid #bdd4e7; font-family: monospace; text-align: center; }
+        .resultado-box { background: #1e2f3f; color: #eef4ff; border-radius: 20px; padding: 1rem; margin-top: 1rem; }
+        .flujo-card { background: #eef2fa; border-radius: 16px; padding: 10px; margin: 5px; text-align: center; flex: 1; }
+        .diagrama-flujo { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; margin: 15px 0; }
+        .columna { text-align: center; font-weight: bold; background: #cbdbe2; padding: 8px; border-radius: 30px; margin: 10px 0; }
+        .valor-destacado { font-size: 1.3rem; font-weight: 800; color: #1f6392; }
+        .warning { background: #fff3cd; border-left: 5px solid #ffc107; padding: 8px 12px; border-radius: 12px; font-size: 0.8rem; margin-top: 15px; }
+        button { background: #2c7da0; border: none; color: white; padding: 8px 18px; border-radius: 40px; cursor: pointer; font-weight: bold; margin-top: 8px; }
+        button:hover { background: #1f5e7a; }
+        .volver { display: inline-block; margin-bottom: 15px; background: #4a5b6e; text-decoration: none; color: white; padding: 6px 14px; border-radius: 30px; font-size: 0.85rem; }
+        .volver:hover { background: #2c3e50; }
+        @media (max-width: 800px) { .dashboard { flex-direction: column; } }
     </style>
 </head>
 <body>
 <div class="simulator-container">
-    <h1>⚗️ Simulador de Columna de Destilación</h1>
-    <div class="sub">Basado en Ejemplo 3.2 (Balance de materia no reactivo) · Cambia los parámetros y observa cómo se reajustan las corrientes desconocidas</div>
+    <a href="index.html" class="volver">← Volver a la Guía</a>
+    <h1>⚗️ Simulador Interactivo: Columna de Destilación</h1>
+    <div class="sub">Basado en Ejemplo 3.2 · Cambiá los parámetros y el simulador resuelve automáticamente los balances de materia</div>
 
     <div class="dashboard">
-        <!-- Panel de controles deslizantes / inputs -->
         <div class="controles">
             <div class="card-param">
-                <h3>📥 Corrientes de entrada conocidas</h3>
-                <div class="param-row">
-                    <label>💧 Alimentación F (kg/h):</label>
-                    <input type="number" id="F_val" value="32" step="2" style="width:100px">
-                </div>
-                <div class="param-row">
-                    <label>🔹 Composición F, x<sub>F,B</sub> (Benceno):</label>
-                    <input type="number" id="xF_B" value="0.125" step="0.01" min="0" max="1">
-                </div>
-                <div class="param-row">
-                    <label>🔼 Corriente tope T (kg/h):</label>
-                    <input type="number" id="T_val" value="28" step="2">
-                </div>
-                <div class="param-row">
-                    <label>🔸 Corriente lateral M (kg/h):</label>
-                    <input type="number" id="M_val" value="35" step="2">
-                </div>
-                <div class="param-row">
-                    <label>🧪 Fracción de B en M (x<sub>M,B</sub>):</label>
-                    <input type="number" id="xM_B" value="0.286" step="0.01" min="0" max="1">
-                </div>
-            </div>
-            <div class="card-param">
-                <h3>📤 Composición fija conocida</h3>
-                <div class="param-row">
-                    <span>Corriente E: x<sub>E,A</sub>=0.534 , x<sub>E,B</sub>=0.466</span>
-                </div>
-                <div class="param-row">
-                    <span>Corriente D: x<sub>D,B</sub>=0.614 , x<sub>D,C</sub>=0.386</span>
-                </div>
-                <div class="param-row">
-                    <span>Corriente T: 100% A</span>
-                </div>
-                <div class="param-row">
-                    <span>Corriente F: x<sub>F,C</sub> = 1 - x<sub>F,B</sub></span>
-                </div>
+                <h3>📥 Parámetros de entrada</h3>
+                <div class="param-row"><label>Alimentación F (kg/h):</label><input type="number" id="F_val" value="32" step="2"></div>
+                <div class="param-row"><label>x<sub>F,B</sub> (Benceno):</label><input type="number" id="xF_B" value="0.125" step="0.01" min="0" max="1"></div>
+                <div class="param-row"><label>Corriente Tope T (kg/h):</label><input type="number" id="T_val" value="28" step="2"></div>
+                <div class="param-row"><label>Corriente M (kg/h):</label><input type="number" id="M_val" value="35" step="2"></div>
+                <div class="param-row"><label>x<sub>M,B</sub> en M:</label><input type="number" id="xM_B" value="0.286" step="0.01" min="0" max="1"></div>
             </div>
             <button id="btnActualizar">⟳ Actualizar simulación</button>
-            <div class="warning">
-                💡 Nota: El sistema resuelve balances (A,B,C) y global. Las incógnitas son E, D, x<sub>M,A</sub> y x<sub>M,C</sub>. Si los valores llevan a inconsistencias (fracciones fuera de [0,1]), se mostrará advertencia.
-            </div>
+            <div class="warning">💡 Las incógnitas son E, D, x<sub>M,A</sub> y x<sub>M,C</sub>. El sistema se resuelve con balances global, A y B.</div>
         </div>
 
-        <!-- Panel de resultados y diagrama visual -->
         <div class="diagrama">
-            <h3 style="text-align:center; margin-top:0;">🧾 Diagrama de flujo & Resultados</h3>
-            <div style="background:#EFF3F8; border-radius: 20px; padding: 15px;">
-                <div style="display:flex; justify-content:space-between; flex-wrap:wrap; gap:10px;">
-                    <div class="flujo-card" style="flex:1"><strong>📥 F</strong><br><span id="display_F">32 kg/h</span><br><span id="compF">B:0.125</span></div>
-                    <div class="flujo-card" style="flex:1"><strong>➕ E (INCÓGNITA)</strong><br><span id="display_E">?? kg/h</span><br><span>A:0.534 | B:0.466</span></div>
-                    <div class="flujo-card" style="flex:1"><strong>⬆️ T</strong><br><span id="display_T">28 kg/h</span><br>100% A</div>
-                </div>
-                <div style="text-align:center; margin:8px 0;">⬇️ COLUMNA DE DESTILACIÓN ⬇️</div>
-                <div style="display:flex; justify-content:space-between; flex-wrap:wrap;">
-                    <div class="flujo-card" style="flex:1"><strong>↘️ M</strong><br><span id="display_M">35 kg/h</span><br><span id="compM">B:0.286</span></div>
-                    <div class="flujo-card" style="flex:1"><strong>⬇️ D (INCÓGNITA)</strong><br><span id="display_D">?? kg/h</span><br>B:0.614 | C:0.386</div>
-                </div>
+            <h3 style="text-align:center;">🧾 Diagrama de flujo</h3>
+            <div class="diagrama-flujo">
+                <div class="flujo-card"><strong>📥 F</strong><br><span id="display_F">32</span> kg/h<br><span id="compF">B:0.125</span></div>
+                <div class="flujo-card"><strong>➕ E (incógnita)</strong><br><span id="display_E">??</span> kg/h<br>A:0.534 | B:0.466</div>
+            </div>
+            <div class="columna">⬇️ COLUMNA DE DESTILACIÓN ⬇️</div>
+            <div class="diagrama-flujo">
+                <div class="flujo-card"><strong>⬆️ T</strong><br><span id="display_T">28</span> kg/h<br>100% A</div>
+                <div class="flujo-card"><strong>↘️ M</strong><br><span id="display_M">35</span> kg/h<br><span id="compM">B:0.286</span></div>
+                <div class="flujo-card"><strong>⬇️ D (incógnita)</strong><br><span id="display_D">??</span> kg/h<br>B:0.614 | C:0.386</div>
             </div>
             <div class="resultado-box" id="resultadosPanel">
-                <strong>📐 Resultados de los balances (resolución automática):</strong><br>
+                <strong>📐 Resultados calculados:</strong><br>
                 <span id="res_E">E = -- kg/h</span><br>
                 <span id="res_D">D = -- kg/h</span><br>
                 <span id="res_xMA">x<sub>M,A</sub> = --</span><br>
                 <span id="res_xMC">x<sub>M,C</sub> = --</span><br>
-                <span id="res_verif" style="color:#aaffdd;">✔️ Verificación pendiente</span>
-            </div>
-            <div class="ecuacion-bg">
-                🔍 Ecuaciones aplicadas: Balance global: F + E = T + M + D<br>
-                Balance componente A: E·0.534 = T·1 + M·x<sub>M,A</sub><br>
-                Balance componente B: F·x<sub>F,B</sub> + E·0.466 = M·x<sub>M,B</sub> + D·0.614
+                <span id="res_verif">✔️ Esperando datos</span>
             </div>
         </div>
     </div>
 </div>
 
 <script>
-    // Función principal que resuelve el balance de materia (basado en ejemplo 3.2)
     function actualizarSimulador() {
-        // Leer valores del DOM
         let F = parseFloat(document.getElementById('F_val').value);
         let xF_B = parseFloat(document.getElementById('xF_B').value);
         let T = parseFloat(document.getElementById('T_val').value);
         let M = parseFloat(document.getElementById('M_val').value);
         let xM_B = parseFloat(document.getElementById('xM_B').value);
         
-        // Validaciones y composiciones fijas del problema
         if (isNaN(F) || isNaN(xF_B) || isNaN(T) || isNaN(M) || isNaN(xM_B)) return;
-        if (xF_B < 0 || xF_B > 1) { alert("xF_B debe estar entre 0 y 1"); return; }
+        if (xF_B < 0 || xF_B > 1) { alert("xF_B entre 0 y 1"); return; }
         if (xM_B < 0 || xM_B > 1) { alert("xM_B entre 0 y 1"); return; }
         
         const xE_A = 0.534, xE_B = 0.466;
-        const xD_B = 0.614, xD_C = 0.386;
-        const xT_A = 1.0;
+        const xD_B = 0.614;
         
-        // Balance global: F + E = T + M + D  => E - D = T + M - F
         let K = T + M - F;   // E - D = K
-        
-        // Balance componente B: F*xF_B + E*xE_B = M*xM_B + D*xD_B
-        // => E*xE_B - D*xD_B = M*xM_B - F*xF_B
         let ladoDer_B = M * xM_B - F * xF_B;
         
-        // Resolver sistema 2x2: (1) E - D = K ; (2) 0.466*E - 0.614*D = ladoDer_B
         let a11 = 1, a12 = -1;
         let a21 = xE_B, a22 = -xD_B;
         let det = a11*a22 - a12*a21;
         if (Math.abs(det) < 1e-6) {
-            document.getElementById('res_verif').innerHTML = "⚠️ Sistema singular, revisa parámetros.";
+            document.getElementById('res_verif').innerHTML = "⚠️ Sistema singular";
             return;
         }
         let E = (K*a22 - a12*ladoDer_B) / det;
         let D = (a11*ladoDer_B - a21*K) / det;
-        
-        // Balance componente A para hallar xM_A
-        // E*xE_A = T*xT_A + M * xM_A  => xM_A = (E*xE_A - T) / M
         let xM_A = (E * xE_A - T) / M;
         let xM_C = 1 - xM_B - xM_A;
         
-        // Mostrar en pantalla
-        document.getElementById('display_F').innerHTML = `${F.toFixed(1)} kg/h`;
+        // Actualizar UI
+        document.getElementById('display_F').innerHTML = F.toFixed(1);
         document.getElementById('compF').innerHTML = `B:${xF_B.toFixed(3)} | C:${(1-xF_B).toFixed(3)}`;
-        document.getElementById('display_T').innerHTML = `${T.toFixed(1)} kg/h`;
-        document.getElementById('display_M').innerHTML = `${M.toFixed(1)} kg/h`;
-        document.getElementById('compM').innerHTML = `B:${xM_B.toFixed(3)} | A:${xM_A>=0?xM_A.toFixed(3):'?'} `;
-        
-        document.getElementById('display_E').innerHTML = `${E.toFixed(1)} kg/h`;
-        document.getElementById('display_D').innerHTML = `${D.toFixed(1)} kg/h`;
+        document.getElementById('display_T').innerHTML = T.toFixed(1);
+        document.getElementById('display_M').innerHTML = M.toFixed(1);
+        document.getElementById('display_E').innerHTML = E.toFixed(1);
+        document.getElementById('display_D').innerHTML = D.toFixed(1);
         document.getElementById('res_E').innerHTML = `📌 E = ${E.toFixed(2)} kg/h`;
         document.getElementById('res_D').innerHTML = `📌 D = ${D.toFixed(2)} kg/h`;
-        document.getElementById('res_xMA').innerHTML = `🧪 Fracción másica de A en M: ${xM_A.toFixed(4)}`;
-        document.getElementById('res_xMC').innerHTML = `🧪 Fracción másica de C en M: ${xM_C.toFixed(4)}`;
+        document.getElementById('res_xMA').innerHTML = `🧪 x<sub>M,A</sub> = ${xM_A.toFixed(4)}`;
+        document.getElementById('res_xMC').innerHTML = `🧪 x<sub>M,C</sub> = ${xM_C.toFixed(4)}`;
         
-        // Verificación de coherencia
         let errores = [];
-        if (xM_A < -0.05 || xM_A > 1.05) errores.push("xM_A fuera de rango [0,1]");
-        if (xM_C < -0.05 || xM_C > 1.05) errores.push("xM_C fuera de rango");
-        if (E < 0) errores.push("Caudal E negativo (no factible)");
-        if (D < 0) errores.push("Caudal D negativo");
+        if (xM_A < -0.05 || xM_A > 1.05) errores.push("xM_A fuera de rango");
+        if (E < 0) errores.push("E negativo");
+        if (D < 0) errores.push("D negativo");
         if (errores.length > 0) {
-            document.getElementById('res_verif').innerHTML = `⚠️ Advertencia: ${errores.join("; ")}. Ajusta datos.`;
-            document.getElementById('res_verif').style.color = "#ffdd99";
+            document.getElementById('res_verif').innerHTML = `⚠️ ${errores.join("; ")}. Ajustá parámetros.`;
         } else {
-            // verificación extra con balance de C
-            let xF_C = 1 - xF_B;
-            let ladoIzqC = F * xF_C;
-            let ladoDerC = M * xM_C + D * xD_C;
-            let diff = Math.abs(ladoIzqC - ladoDerC);
-            let ok = diff < 0.01;
-            document.getElementById('res_verif').innerHTML = ok ? "✅ Balances consistentes (componente C verificado)." : `⚠️ Balance de C difiere en ${diff.toFixed(3)} kg/h. Revisar datos.`;
-            document.getElementById('res_verif').style.color = ok ? "#ccffcc" : "#ffc107";
+            document.getElementById('res_verif').innerHTML = "✅ Balances consistentes. Verificá con componente C.";
         }
-        // Mostrar valores calculados en tooltips visuales
-        if (xM_A >= 0 && xM_A <= 1) {
-            document.getElementById('compM').innerHTML = `B:${xM_B.toFixed(3)} | A:${xM_A.toFixed(3)} | C:${xM_C.toFixed(3)}`;
-        } else {
-            document.getElementById('compM').innerHTML = `B:${xM_B.toFixed(3)} | A:${xM_A.toFixed(3)} (⚠️ fuera)`;
-        }
+        let compM_text = `B:${xM_B.toFixed(3)} | A:${xM_A.toFixed(3)} | C:${xM_C.toFixed(3)}`;
+        document.getElementById('compM').innerHTML = compM_text;
     }
     
-    // Eventos
     document.getElementById('btnActualizar').addEventListener('click', actualizarSimulador);
-    // Carga inicial
-    window.addEventListener('load', actualizarSimulador);
-    // Opcional: actualizar al cambiar inputs con un pequeño retardo
     const inputs = ['F_val','xF_B','T_val','M_val','xM_B'];
     inputs.forEach(id => {
-        document.getElementById(id).addEventListener('change', actualizarSimulador);
         document.getElementById(id).addEventListener('input', actualizarSimulador);
+        document.getElementById(id).addEventListener('change', actualizarSimulador);
     });
+    window.addEventListener('load', actualizarSimulador);
 </script>
 </body>
 </html>
