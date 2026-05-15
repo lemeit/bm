@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simuladores de Balances de Materia | Laboratorio de Industrias</title>
+    <title>Simuladores de Balances de Materia | Laboratorio Industrias</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -79,6 +79,10 @@
             margin-top: 1rem;
         }
         .btn-sim:hover { background: #1b5e20; }
+        .btn-calc {
+            background: #d98c2b;
+        }
+        .btn-calc:hover { background: #b56a1a; }
         footer {
             text-align: center;
             margin-top: 3rem;
@@ -96,35 +100,43 @@
     </div>
 
     <div class="grid-simuladores">
-        <!-- Simulador 1: Destilación -->
+        <!-- TARJETA 1: CALCULADORA UNIVERSAL -->
+        <div class="card-sim">
+            <div class="card-header">🧮 CALCULADORA UNIVERSAL</div>
+            <div class="card-body">
+                <div class="badge">⚖️ Balances paso a paso</div>
+                <p>Resuelve <strong>cualquier ejercicio de balance de materia</strong> (no reactivo). Definí hasta 5 corrientes de entrada y salida, con hasta 4 componentes. La calculadora muestra las ecuaciones planteadas y los resultados detallados.</p>
+                <p><strong>Ideal para:</strong> Verificar ejercicios hechos a mano, explorar diferentes escenarios, aprender la metodología.</p>
+                <a href="calculadora_balances.html" class="btn-sim btn-calc">🔢 Probar Calculadora →</a>
+            </div>
+        </div>
+
+        <!-- TARJETA 2: Destilación -->
         <div class="card-sim">
             <div class="card-header">⚗️ Columna de Destilación</div>
             <div class="card-body">
                 <div class="badge">Basado en Ejemplo 3.2</div>
-                <p>Columna con 3 componentes (A, B, C). Podés cambiar caudales de alimentación F, tope T, corriente lateral M y composiciones. El sistema resuelve automáticamente las incógnitas E, D y la composición de M.</p>
-                <p><strong>Ecuaciones:</strong> Balance global + balances por componente A y B.</p>
+                <p>Columna con 3 componentes (A, B, C). Podés cambiar caudales de alimentación F, tope T, corriente lateral M y composiciones con sliders. El sistema resuelve automáticamente las incógnitas E, D y la composición de M.</p>
                 <a href="simu_destilacion.html" class="btn-sim">🔧 Probar Simulador →</a>
             </div>
         </div>
 
-        <!-- Simulador 2: Mezclador -->
+        <!-- TARJETA 3: Mezclador -->
         <div class="card-sim">
             <div class="card-header">🧪 Mezclador de Gases</div>
             <div class="card-body">
                 <div class="badge">Basado en Ejemplo 3.1</div>
-                <p>Mezcla de N₂ e H₂. Podés cambiar el flujo de N₂ (kg/h) y el flujo total de salida (kgmol/h). El simulador calcula el H₂ necesario y la composición molar final.</p>
-                <p><strong>Concepto:</strong> Entrada = Salida. Conversión de unidades kg → kgmol.</p>
+                <p>Mezcla de N₂ e H₂. Usá sliders para ajustar el flujo de N₂ (kg/h) y el flujo total de salida (kgmol/h). El simulador calcula el H₂ necesario y la composición molar final.</p>
                 <a href="simu_mezclador.html" class="btn-sim">🔧 Probar Simulador →</a>
             </div>
         </div>
 
-        <!-- Simulador 3: Secado -->
+        <!-- TARJETA 4: Secado -->
         <div class="card-sim">
             <div class="card-header">🌿 Secado de Pieles</div>
             <div class="card-body">
                 <div class="badge">Basado en Ejemplo 3.3</div>
-                <p>Proceso de secado donde se elimina agua. Podés modificar el peso final, la humedad final y el porcentaje de pérdida. El simulador calcula la alimentación inicial, agua extraída y % de eficiencia.</p>
-                <p><strong>Balance:</strong> Balance de sólido seco + balance de agua.</p>
+                <p>Proceso de secado con sliders para modificar peso final y humedad. Calcula alimentación inicial, agua extraída, % de eficiencia y relación agua/piel seca.</p>
                 <a href="simu_secado.html" class="btn-sim">🔧 Probar Simulador →</a>
             </div>
         </div>
