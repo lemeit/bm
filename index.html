@@ -5,11 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, print-scale: 1.0">
     <title>Balances de Materia | Laboratorio de Industrias 7° TQ</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
             line-height: 1.5;
@@ -33,37 +29,11 @@
             margin-bottom: 2rem;
             text-align: center;
         }
-        .header-materia h1 {
-            font-size: 2rem;
-            margin-bottom: 0.5rem;
-            border: none;
-            padding: 0;
-            color: white;
-        }
-        .header-materia p {
-            font-size: 1.1rem;
-            opacity: 0.9;
-        }
-        h1 {
-            font-size: 1.8rem;
-            border-left: 6px solid #2c7da0;
-            padding-left: 1.2rem;
-            margin-bottom: 0.5rem;
-            color: #0b3b4f;
-        }
-        h2 {
-            font-size: 1.6rem;
-            margin-top: 2rem;
-            margin-bottom: 0.75rem;
-            color: #1f5068;
-            border-bottom: 2px solid #cbdbe2;
-            padding-bottom: 0.3rem;
-        }
-        h3 {
-            font-size: 1.3rem;
-            margin: 1.5rem 0 0.8rem 0;
-            color: #2c7da0;
-        }
+        .header-materia h1 { font-size: 2rem; margin-bottom: 0.5rem; border: none; padding: 0; color: white; }
+        .header-materia p { font-size: 1.1rem; opacity: 0.9; }
+        h1 { font-size: 1.8rem; border-left: 6px solid #2c7da0; padding-left: 1.2rem; margin-bottom: 0.5rem; color: #0b3b4f; }
+        h2 { font-size: 1.6rem; margin-top: 2rem; margin-bottom: 0.75rem; color: #1f5068; border-bottom: 2px solid #cbdbe2; padding-bottom: 0.3rem; }
+        h3 { font-size: 1.3rem; margin: 1.5rem 0 0.8rem 0; color: #2c7da0; }
         .ref-box {
             background: #eef2fa;
             padding: 1rem 1.5rem;
@@ -118,24 +88,19 @@
             float: right;
             margin-top: -0.5rem;
         }
-        .btn-copy:hover {
-            background: #1f5e7a;
-        }
+        .btn-copy:hover { background: #1f5e7a; }
         .simulador-link {
             display: inline-block;
             background: #2e7d32;
             color: white;
-            padding: 12px 24px;
+            padding: 12px 28px;
             border-radius: 40px;
             text-decoration: none;
             font-weight: bold;
             margin: 1rem 0;
             transition: 0.2s;
         }
-        .simulador-link:hover {
-            background: #1b5e20;
-            transform: scale(1.02);
-        }
+        .simulador-link:hover { background: #1b5e20; transform: scale(1.02); }
         .nota {
             font-size: 0.85rem;
             color: #4a5b6e;
@@ -158,17 +123,12 @@
             .python-code { background: #f4f4f4; color: black; border: 1px solid #aaa; }
             .card-ejemplo { break-inside: avoid; page-break-inside: avoid; }
         }
-        .ecuacion {
-            font-family: monospace;
-            background: #f0f2f5;
-            padding: 0.2rem 0.4rem;
-            border-radius: 8px;
-        }
+        .ecuacion { font-family: monospace; background: #f0f2f5; padding: 0.2rem 0.4rem; border-radius: 8px; }
+        .badge-sim { background: #ff9800; color: #1e2a3a; padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: bold; margin-left: 10px; }
     </style>
 </head>
 <body>
 <div class="container">
-    <!-- Encabezado personalizado de la materia -->
     <div class="header-materia">
         <h1>⚖️ Balances de Materia en Ingeniería de Procesos</h1>
         <p>Laboratorio de Industrias - 7° TQ - EEST N°1 Saladillo</p>
@@ -176,20 +136,19 @@
         <p style="font-size:0.9rem; margin-top:10px;">Basado en Felder & Rousseau (2004) y Himmelblau (1997)</p>
     </div>
 
-    <!-- Enlace al simulador interactivo -->
+    <!-- Enlace a la página de simuladores -->
     <div style="text-align: center; margin: 1rem 0 2rem 0;">
-        <a href="simu_destilacion.html" class="simulador-link">🎮 ¡Probar el Simulador Interactivo de Destilación! →</a>
-        <p style="margin-top: 8px; font-size: 0.85rem;">Experimentá cambiando caudales y composiciones, el simulador resuelve automáticamente los balances.</p>
+        <a href="simuladores.html" class="simulador-link">🎮 ¡Acceder a los Simuladores Interactivos! (3 procesos) →</a>
+        <p style="margin-top: 8px; font-size: 0.85rem;">Destilación | Mezclador | Secado - Cambiá variables y mirá cómo se resuelven los balances en tiempo real</p>
     </div>
 
-    <!-- SECCIÓN DE FUNDAMENTOS Y CONTEXTO TEÓRICO -->
     <div class="ref-box">
         <strong>📚 Fundamentos de Balance de Materia (Felder, Himmelblau):</strong><br>
         • <strong>Ley de conservación de la masa:</strong> “La materia no se crea ni se destruye”. En procesos no reactivos sin acumulación: <span class="ecuacion">Entrada = Salida</span>.<br>
         • <strong>Sistemas y fronteras:</strong> Un sistema puede ser abierto (transferencia de masa) o cerrado. Para análisis se define una frontera (volumen de control).<br>
-        • <strong>Procesos en estado estacionario:</strong> Las variables (flujos, composiciones, temperatura) no cambian en el tiempo ⇒ Acumulación = 0.<br>
+        • <strong>Procesos en estado estacionario:</strong> Las variables no cambian en el tiempo ⇒ Acumulación = 0.<br>
         • <strong>Balance total y por componentes:</strong> Se escribe un balance para cada especie química presente. Suma de fracciones másicas o molares = 1.<br>
-        • <strong>Grados de libertad:</strong> Número de variables desconocidas menos ecuaciones independientes. Para resolver un problema se requiere G.L. = 0.<br>
+        • <strong>Grados de libertad:</strong> Número de variables desconocidas menos ecuaciones independientes. Para resolver se requiere G.L. = 0.<br>
         • <strong>Metodología propuesta por Felder:</strong> 1) Leer/diagramar, 2) Etiquetar corrientes, 3) Elegir base de cálculo, 4) Escribir balances, 5) Resolver, 6) Verificar.
     </div>
 
@@ -197,12 +156,12 @@
     <div class="pasos" style="background: #e9ecef;">
         <strong>✅ Paso a paso (adaptado de Felder & Rousseau, Cap. 4):</strong><br>
         1. <strong>Interpretar el problema</strong>: identificar datos explícitos e implícitos, y las incógnitas.<br>
-        2. <strong>Dibujar diagrama de flujo</strong>: representar equipos, corrientes y composiciones conocidas. Usar símbolos para incógnitas.<br>
-        3. <strong>Elegir base de cálculo</strong>: tiempo (ej. 1 hora) o masa (ej. 100 kg), que facilite los cálculos.<br>
+        2. <strong>Dibujar diagrama de flujo</strong>: representar equipos, corrientes y composiciones conocidas.<br>
+        3. <strong>Elegir base de cálculo</strong>: tiempo (ej. 1 hora) o masa (ej. 100 kg).<br>
         4. <strong>Analizar grados de libertad</strong>: comparar número de incógnitas vs. ecuaciones independientes.<br>
         5. <strong>Plantear ecuaciones</strong>: balance global y balances por componente.<br>
         6. <strong>Resolver el sistema</strong>: algebraico, sustitución o métodos matriciales.<br>
-        7. <strong>Verificar</strong> usando un balance no utilizado o chequeo de consistencia.
+        7. <strong>Verificar</strong> usando un balance no utilizado.
     </div>
 
     <!-- EJEMPLO 3.1 -->
@@ -220,7 +179,7 @@
             <button class="btn-copy" onclick="copyToClipboard('code31')">📋 Copiar</button>
             <div id="code31" class="python-code">
 flujo_N2_kg = 280
-flujo_N2_kmol = 280 / 28   # 10
+flujo_N2_kmol = 280 / 28
 C_total = 40
 B = C_total - flujo_N2_kmol
 yH2 = B / C_total
@@ -260,29 +219,6 @@ print(f"E={E:.1f}, D={D:.1f}")
             <strong>✍️ Solución:</strong> A = 2200 lb, B = 1300 lb agua, % eliminado = 95.6%.
         </div>
     </div>
-
-    <!-- EJEMPLO 3.4 Múltiples unidades -->
-    <div class="card-ejemplo">
-        <h3>📌 Ejemplo 3.4 – Proceso dos unidades</h3>
-        <p><strong>Resultados:</strong> G=60 kg, x<sub>G,A</sub>=0.233; P=60 kg, x<sub>P,A</sub>=0.0833; M=90 kg, x<sub>M,A</sub>=0.2556.</p>
-    </div>
-
-    <!-- EJEMPLO 3.6 Recirculación -->
-    <div class="card-ejemplo">
-        <h3>📌 Ejemplo 3.6 – Proceso con recirculación</h3>
-        <p><strong>Resultados clave:</strong> R = 7667 lb/h, M = 9750 lb/h, E = 17667 lb/h, x<sub>E,H2O</sub>=0.724.</p>
-    </div>
-
-    <!-- Tabla resumen -->
-    <h2>📊 Ecuaciones clave</h2>
-    <table style="width:100%; border-collapse:collapse; margin:1rem 0;">
-        <thead><tr style="background:#e2e8f0;"><th>Concepto</th><th>Ecuación</th></tr></thead>
-        <tbody>
-            <tr><td>Balance global</td><td>Σ m_entrada = Σ m_salida</td></tr>
-            <tr><td>Balance por componente</td><td>Σ (m_i·x_i,ent) = Σ (m_j·x_j,sal)</td></tr>
-            <tr><td>Fracción másica</td><td>Σ x_k = 1</td></tr>
-        </tbody>
-    </table>
 
     <div class="nota">
         <strong>📖 Referencias:</strong> Felder, R. M. & Rousseau, R. W. (2004). Principios elementales de los procesos químicos. Himmelblau, D. M. (1997). Principios básicos y cálculos en ingeniería química.

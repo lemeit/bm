@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulador: Secado de Pieles | Laboratorio Industrias</title>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #e0eafc 0%, #cfdef3 100%);
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        .simulator-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 28px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+            padding: 1.5rem 2rem 2rem;
+        }
+        h1 { color: #1e4668; }
+        .sub { color: #2c5a7a; margin-bottom: 1.5rem; border-left: 3px solid #2c7da0; padding-left: 15px; }
+        .dashboard { display: flex; flex-wrap: wrap; gap: 25px; }
+        .controles { flex: 1; background: #f8f9ff; padding: 1.2rem; border-radius: 24px; }
+        .resultados { flex: 1; background: #1e2f3f; color: white; border-radius: 24px; padding: 1.2rem; }
+        .param-row { display: flex; justify-content: space-between; margin: 15px 0; align-items: center; }
+        input { width: 130px; padding: 8px; border-radius: 12px; border: 1px solid #bdd4e7; text-align: center; }
+        label { font-weight: 600; }
+        button { background: #2c7da0; border: none; color: white; padding: 8px 20px; border-radius: 40px; cursor: pointer; font-weight: bold; margin-top: 10px; width: 100%; }
+        .volver { display: inline-block; margin-bottom: 20px; background: #4a5b6e; text-decoration: none; color: white; padding: 6px 14px; border-radius: 30px; font-size: 0.85rem; }
+        .diagrama { text-align: center; margin: 20px 0; padding: 15px; background: #eef2fa; border-radius: 20px; color: #1e2a3a; }
+        .valor-grande { font-size: 1.5rem; font-weight: bold; color: #2c7da0; }
+        .warning { font-size:0.8rem; background:#fff3cd; padding:8px; border-radius:12px; margin-top:15px; }
+    </style>
+</head>
+<body>
+<div class="simulator-container">
+    <a href="simuladores.html" class="volver">← Volver a Simuladores</a>
+    <h1>🌿 Simulador: Secado de Pieles</h1>
+    <div class="sub">Basado en Ejemplo 3.3 · Balance de sólido seco y agua</div>
+
+    <div class="dashboard">
+        <div class="controles">
+            <div class="param-row"><label>Peso final después del secado (lb):</label><input type="number" id="peso_final" value="900" step="50"></div>
+            <div class="param-row"><label>Humedad final (%):</label><input type="number" id="humedad_final" value="7" step="1" min="0" max="100"></div>
+            <div class="param-row"><label>Pérdida de peso inicial (%):</label><input type="number" id="perdida_peso" value="59.1" step="5" min="0" max="100"></div>
+            <button id="btnCalcular">Calcular / Actualizar</button>
+            <div class="warning">
+                💡 El simulador calcula: alimentación inicial, agua extraída, % de agua eliminada y relación agua/piel seca.
+            </div>
+        </div>
+        <div class="resultados">
+            <h3 style="margin-top:0;">📊 Resultados del proceso</h3>
+            <div class="diagrama">
+                <div>📥 Alimentación inicial: <strong><span id="alimentacion">--</span> lb</strong></div>
+                <div>💧 Agua extraída: <strong><span id="agua_extraida">--</span> lb</strong></div>
+                <div>🐄 Piel totalmente seca: <strong><span id="piel_seca">--</span> lb</strong></div>
+                <hr>
+                <div>📊 % Agua eliminada: <strong><span id="porc_elim">--</span> %</strong></div>
+                <div>💧 lb agua / lb piel seca: <strong><span id="relacion_agua">--</span></strong></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function calcular() {
+        let pesoFinal = parseFloat(document.getElementById('peso_final').value);
+        let humedadFinal = parseFloat(document.getElementById('humedad_final').value);
+        let perdidaPeso = parseFloat(document.getElementById('perdida_peso').value);
+        
+        if (isNaN(pesoFinal) || isNaN(humedadFinal) || isNaN(perdidaPeso)) return;
+        
+        let aguaFinal = pesoFinal * (humedadFinal / 100);
+        let pielSeca = pesoFinal - aguaFinal;
+        
+        // A = alimentación inicial, B = agua extraída = 0.591*A (o el % dado)
+        // Balance piel seca: A * (1 - xA_agua) = pielSeca
+        // Balance agua: A*xA_agua = B + aguaFinal, con B = (perdidaPeso/100)*A
+        // Entonces: A - pielSeca = (perdidaPeso/100)*A + aguaFinal
+        let fraccionPerdida = perdidaPeso / 100;
+        let A = (pielSeca + aguaFinal) / (1 - fraccionPerdida);
+        let B = fraccionPerdida * A;
+        let aguaInicial = A - pielSeca;
+        let porcEliminado = (B / aguaInicial) * 100;
+        let relacionAguaPiel = B / pielSeca;
+        
+        document.getElementById('alimentacion').innerHTML = A.toFixed(1);
+        document.getElementById('agua_extraida').innerHTML = B.toFixed(1);
+        document.getElementById('piel_seca').innerHTML = pielSeca.toFixed(1);
+        document.getElementById('porc_elim').innerHTML = porcEliminado.toFixed(1);
+        document.getElementById('relacion_agua').innerHTML = relacionAguaPiel.toFixed(3);
+        
+        if (A < 0 || B < 0) {
+            document.getElementById('alimentacion').innerHTML = "⚠️ Valores inconsistentes";
+        }
+    }
+    
+    document.getElementById('btnCalcular').addEventListener('click', calcular);
+    const inputs = ['peso_final', 'humedad_final', 'perdida_peso'];
+    inputs.forEach(id => {
+        document.getElementById(id).addEventListener('input', calcular);
+        document.getElementById(id).addEventListener('change', calcular);
+    });
+    window.addEventListener('load', calcular);
+</script>
+</body>
+</html>

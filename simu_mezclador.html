@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulador: Mezclador de Gases | Laboratorio Industrias</title>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #e0eafc 0%, #cfdef3 100%);
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        .simulator-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 28px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+            padding: 1.5rem 2rem 2rem;
+        }
+        h1 { color: #1e4668; }
+        .sub { color: #2c5a7a; margin-bottom: 1.5rem; border-left: 3px solid #2c7da0; padding-left: 15px; }
+        .dashboard { display: flex; flex-wrap: wrap; gap: 25px; }
+        .controles { flex: 1; background: #f8f9ff; padding: 1.2rem; border-radius: 24px; }
+        .resultados { flex: 1; background: #1e2f3f; color: white; border-radius: 24px; padding: 1.2rem; }
+        .param-row { display: flex; justify-content: space-between; margin: 15px 0; align-items: center; }
+        input { width: 130px; padding: 8px; border-radius: 12px; border: 1px solid #bdd4e7; text-align: center; }
+        label { font-weight: 600; }
+        button { background: #2c7da0; border: none; color: white; padding: 8px 20px; border-radius: 40px; cursor: pointer; font-weight: bold; margin-top: 10px; width: 100%; }
+        .volver { display: inline-block; margin-bottom: 20px; background: #4a5b6e; text-decoration: none; color: white; padding: 6px 14px; border-radius: 30px; font-size: 0.85rem; }
+        .diagrama { text-align: center; margin: 20px 0; padding: 15px; background: #eef2fa; border-radius: 20px; }
+        .valor-grande { font-size: 1.8rem; font-weight: bold; color: #2c7da0; }
+    </style>
+</head>
+<body>
+<div class="simulator-container">
+    <a href="simuladores.html" class="volver">← Volver a Simuladores</a>
+    <h1>🧪 Simulador: Mezclador de Gases</h1>
+    <div class="sub">Basado en Ejemplo 3.1 · Mezcla de N₂ e H₂ puros</div>
+
+    <div class="dashboard">
+        <div class="controles">
+            <div class="param-row"><label>Flujo de N₂ (kg/h):</label><input type="number" id="flujo_N2" value="280" step="10"></div>
+            <div class="param-row"><label>Flujo total de salida (kgmol/h):</label><input type="number" id="salida_total" value="40" step="5"></div>
+            <button id="btnCalcular">Calcular / Actualizar</button>
+            <div class="warning" style="margin-top:15px; font-size:0.8rem; background:#fff3cd; padding:8px; border-radius:12px;">
+                ⚠️ El N₂ entra puro, el H₂ entra puro. Se calcula automáticamente el H₂ necesario y la composición final.
+            </div>
+        </div>
+        <div class="resultados">
+            <h3 style="margin-top:0;">📊 Resultados</h3>
+            <div class="diagrama">
+                <div>📥 N₂: <strong><span id="n2_kmol">--</span> kgmol/h</strong></div>
+                <div>➕ H₂: <strong><span id="h2_kmol">--</span> kgmol/h</strong></div>
+                <div style="margin:10px 0;">⬇️ MEZCLADOR ⬇️</div>
+                <div>📤 Salida total: <strong><span id="salida_mostrar">--</span> kgmol/h</strong></div>
+                <hr>
+                <div>🧪 Fracción molar H₂: <strong><span id="yH2">--</span></strong></div>
+                <div>🧪 Fracción molar N₂: <strong><span id="yN2">--</span></strong></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function calcular() {
+        let flujoN2_kg = parseFloat(document.getElementById('flujo_N2').value);
+        let salidaTotal = parseFloat(document.getElementById('salida_total').value);
+        if (isNaN(flujoN2_kg) || isNaN(salidaTotal)) return;
+        
+        let n2_kmol = flujoN2_kg / 28;  // Masa molar N2 = 28 kg/kmol
+        let h2_kmol = salidaTotal - n2_kmol;
+        let yH2 = h2_kmol / salidaTotal;
+        let yN2 = 1 - yH2;
+        
+        document.getElementById('n2_kmol').innerHTML = n2_kmol.toFixed(2);
+        document.getElementById('h2_kmol').innerHTML = h2_kmol.toFixed(2);
+        document.getElementById('salida_mostrar').innerHTML = salidaTotal.toFixed(1);
+        document.getElementById('yH2').innerHTML = yH2.toFixed(4);
+        document.getElementById('yN2').innerHTML = yN2.toFixed(4);
+        
+        if (h2_kmol < 0) {
+            document.getElementById('h2_kmol').innerHTML = "⚠️ N₂ excede salida total";
+        }
+    }
+    
+    document.getElementById('btnCalcular').addEventListener('click', calcular);
+    document.getElementById('flujo_N2').addEventListener('input', calcular);
+    document.getElementById('salida_total').addEventListener('input', calcular);
+    window.addEventListener('load', calcular);
+</script>
+</body>
+</html>

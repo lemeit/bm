@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simuladores de Balances de Materia | Laboratorio de Industrias</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #e0eafc 0%, #cfdef3 100%);
+            padding: 2rem 1rem;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .header {
+            background: linear-gradient(135deg, #1e4668 0%, #2c7da0 100%);
+            color: white;
+            padding: 2rem;
+            border-radius: 28px;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        .header h1 { font-size: 2rem; margin-bottom: 0.5rem; }
+        .header p { opacity: 0.9; }
+        .volver {
+            display: inline-block;
+            background: #4a5b6e;
+            color: white;
+            text-decoration: none;
+            padding: 8px 20px;
+            border-radius: 30px;
+            margin-bottom: 1.5rem;
+            font-weight: bold;
+        }
+        .volver:hover { background: #2c3e50; }
+        .grid-simuladores {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 1.8rem;
+        }
+        .card-sim {
+            background: white;
+            border-radius: 28px;
+            overflow: hidden;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            transition: transform 0.2s;
+        }
+        .card-sim:hover { transform: translateY(-5px); }
+        .card-header {
+            background: #2c7da0;
+            color: white;
+            padding: 1.2rem;
+            text-align: center;
+            font-size: 1.5rem;
+        }
+        .card-body { padding: 1.5rem; }
+        .card-body p { color: #4a5b6e; margin-bottom: 1rem; }
+        .badge {
+            background: #eef2fa;
+            color: #1e4668;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            display: inline-block;
+            margin-bottom: 1rem;
+        }
+        .btn-sim {
+            display: inline-block;
+            background: #2e7d32;
+            color: white;
+            padding: 10px 24px;
+            border-radius: 40px;
+            text-decoration: none;
+            font-weight: bold;
+            margin-top: 1rem;
+        }
+        .btn-sim:hover { background: #1b5e20; }
+        footer {
+            text-align: center;
+            margin-top: 3rem;
+            color: #5f6c7a;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <a href="index.html" class="volver">← Volver a la Guía teórica</a>
+    <div class="header">
+        <h1>🎮 Laboratorio de Simulación</h1>
+        <p>Balances de Materia en Procesos No Reactivos | Interactúa y aprende</p>
+        <p style="font-size:0.9rem; margin-top:10px;">Prof. Ing. Luciano Lamaita - 7° TQ EEST N°1 Saladillo</p>
+    </div>
+
+    <div class="grid-simuladores">
+        <!-- Simulador 1: Destilación -->
+        <div class="card-sim">
+            <div class="card-header">⚗️ Columna de Destilación</div>
+            <div class="card-body">
+                <div class="badge">Basado en Ejemplo 3.2</div>
+                <p>Columna con 3 componentes (A, B, C). Podés cambiar caudales de alimentación F, tope T, corriente lateral M y composiciones. El sistema resuelve automáticamente las incógnitas E, D y la composición de M.</p>
+                <p><strong>Ecuaciones:</strong> Balance global + balances por componente A y B.</p>
+                <a href="simu_destilacion.html" class="btn-sim">🔧 Probar Simulador →</a>
+            </div>
+        </div>
+
+        <!-- Simulador 2: Mezclador -->
+        <div class="card-sim">
+            <div class="card-header">🧪 Mezclador de Gases</div>
+            <div class="card-body">
+                <div class="badge">Basado en Ejemplo 3.1</div>
+                <p>Mezcla de N₂ e H₂. Podés cambiar el flujo de N₂ (kg/h) y el flujo total de salida (kgmol/h). El simulador calcula el H₂ necesario y la composición molar final.</p>
+                <p><strong>Concepto:</strong> Entrada = Salida. Conversión de unidades kg → kgmol.</p>
+                <a href="simu_mezclador.html" class="btn-sim">🔧 Probar Simulador →</a>
+            </div>
+        </div>
+
+        <!-- Simulador 3: Secado -->
+        <div class="card-sim">
+            <div class="card-header">🌿 Secado de Pieles</div>
+            <div class="card-body">
+                <div class="badge">Basado en Ejemplo 3.3</div>
+                <p>Proceso de secado donde se elimina agua. Podés modificar el peso final, la humedad final y el porcentaje de pérdida. El simulador calcula la alimentación inicial, agua extraída y % de eficiencia.</p>
+                <p><strong>Balance:</strong> Balance de sólido seco + balance de agua.</p>
+                <a href="simu_secado.html" class="btn-sim">🔧 Probar Simulador →</a>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        Laboratorio de Industrias - EEST N°1 Saladillo | Material interactivo para acompañar la guía teórica
+    </footer>
+</div>
+</body>
+</html>
