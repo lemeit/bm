@@ -1,429 +1,746 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calculadora Universal de Balances de Materia | Laboratorio Industrias</title>
-    <style>
-        * { box-sizing: border-box; }
-        body {
-            background: #1a2a32;
-            font-family: 'Segoe UI', 'Roboto', monospace;
-            padding: 20px;
-        }
-        .calc-container {
-            max-width: 1400px;
-            margin: 0 auto;
-            background: #f5f7fa;
-            border-radius: 28px;
-            overflow: hidden;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
-        }
-        .header {
-            background: #0f212e;
-            color: white;
-            padding: 15px 24px;
-            display: flex;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            align-items: center;
-        }
-        .header h1 { margin: 0; font-size: 1.4rem; }
-        .header a {
-            color: #ffd966;
-            background: #1e3a4a;
-            padding: 5px 14px;
-            border-radius: 30px;
-            text-decoration: none;
-        }
-        .config-panel {
-            background: #eef2f5;
-            padding: 20px;
-            border-bottom: 2px solid #c0cfdf;
-        }
-        .param-row {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 20px;
-            margin-bottom: 20px;
-            align-items: flex-end;
-        }
-        .param-group {
-            background: white;
-            border-radius: 20px;
-            padding: 15px;
-            box-shadow: 0 1px 4px rgba(0,0,0,0.1);
-            flex: 1;
-            min-width: 200px;
-        }
-        .param-group label {
-            font-weight: bold;
-            display: block;
-            margin-bottom: 8px;
-        }
-        input, select {
-            width: 100%;
-            padding: 8px;
-            border-radius: 16px;
-            border: 1px solid #bdc4cc;
-            font-family: monospace;
-        }
-        button {
-            background: #2c7da0;
-            border: none;
-            color: white;
-            padding: 10px 20px;
-            border-radius: 40px;
-            cursor: pointer;
-            font-weight: bold;
-            margin-top: 10px;
-        }
-        .corrientes-panel {
-            padding: 20px;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 25px;
-            justify-content: center;
-            background: #dce5ec;
-        }
-        .corriente-block {
-            background: white;
-            border-radius: 24px;
-            padding: 15px;
-            min-width: 260px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            border-top: 5px solid #2c7da0;
-        }
-        .corriente-title {
-            font-weight: bold;
-            font-size: 1.2rem;
-            margin-bottom: 10px;
-            text-align: center;
-        }
-        .comp-row {
-            display: flex;
-            gap: 8px;
-            margin: 8px 0;
-            align-items: center;
-        }
-        .comp-row input {
-            width: 70px;
-            text-align: center;
-        }
-        .resultados {
-            background: #0f212e;
-            color: white;
-            padding: 20px;
-            margin-top: 20px;
-        }
-        .ecuacion {
-            font-family: monospace;
-            background: #1e3a4a;
-            padding: 8px;
-            border-radius: 12px;
-            margin: 8px 0;
-        }
-        .tabla-resultados {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 15px;
-        }
-        .tabla-resultados th, .tabla-resultados td {
-            border: 1px solid #4a6a7a;
-            padding: 8px;
-            text-align: center;
-        }
-        .warning {
-            color: #ffaa66;
-        }
-        @media (max-width: 800px) {
-            .corrientes-panel { flex-direction: column; align-items: center; }
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calculadora Universal de Balances | Laboratorio Industrias</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Sora:wght@300;400;500;600;700;800&display=swap');
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0a0e14;--surf:#0f1520;--surf2:#141d2b;--surf3:#1a2538;
+  --border:#1e2d42;--border2:#243550;
+  --text:#dce8f5;--muted:#6b859e;--muted2:#4a6070;
+  --accent:#a78bfa;--accent2:#8b5cf6;
+  --green:#34d399;--yellow:#fbbf24;--red:#f87171;--blue:#38bdf8;--orange:#fb923c;
+  --c0:#38bdf8;--c1:#fb923c;--c2:#34d399;--c3:#f87171;  /* component colors */
+  --e-color:#38bdf8; /* entrada */
+  --s-color:#fb923c; /* salida */
+  --mono:'JetBrains Mono',monospace;--sans:'Sora',sans-serif;
+}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14px;line-height:1.6;min-height:100vh;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");pointer-events:none;z-index:0;opacity:.4}
+
+/* ── Header ── */
+.header{position:sticky;top:0;z-index:100;background:linear-gradient(90deg,var(--surf) 0%,#100c1a 100%);border-bottom:1px solid var(--border);padding:14px 24px;display:flex;align-items:center;gap:16px}
+.header-icon{font-size:22px}
+.header-title{font-family:var(--mono);font-size:13px;font-weight:700;letter-spacing:.02em}
+.header-sub{font-size:11px;color:var(--muted);font-family:var(--mono)}
+.header-right{margin-left:auto;display:flex;gap:8px;align-items:center}
+.btn-back{background:var(--surf3);border:1px solid var(--border2);color:var(--muted);padding:6px 14px;border-radius:6px;text-decoration:none;font-size:11px;font-family:var(--mono);transition:.2s}
+.btn-back:hover{color:var(--text);border-color:var(--accent)}
+.tag{background:#a78bfa20;color:var(--accent);border:1px solid #a78bfa40;border-radius:4px;padding:2px 8px;font-size:10px;font-family:var(--mono);font-weight:600}
+
+/* ── Layout ── */
+.main{position:relative;z-index:5;display:grid;grid-template-columns:280px 1fr;min-height:calc(100vh - 53px)}
+
+/* ── Config sidebar ── */
+.sidebar{background:var(--surf);border-right:1px solid var(--border);padding:20px;display:flex;flex-direction:column;gap:16px;position:sticky;top:53px;height:calc(100vh - 53px);overflow-y:auto}
+.sidebar-title{font-family:var(--mono);font-size:10px;font-weight:700;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-bottom:2px;display:flex;align-items:center;gap:6px}
+.sidebar-title::before{content:'';display:block;width:3px;height:12px;background:var(--accent);border-radius:2px}
+
+/* Config section */
+.config-section{background:var(--surf2);border:1px solid var(--border);border-radius:8px;padding:14px;display:flex;flex-direction:column;gap:12px}
+.field-row{display:flex;flex-direction:column;gap:5px}
+.field-label{font-family:var(--mono);font-size:10px;font-weight:600;color:var(--muted);letter-spacing:.04em;text-transform:uppercase}
+.field-input{background:var(--surf3);border:1px solid var(--border2);color:var(--text);padding:8px 12px;border-radius:6px;font-family:var(--mono);font-size:13px;width:100%;outline:none;transition:.15s;-moz-appearance:textfield}
+.field-input::-webkit-inner-spin-button,.field-input::-webkit-outer-spin-button{-webkit-appearance:none}
+.field-input:focus{border-color:var(--accent);background:#a78bfa08}
+.field-select{background:var(--surf3);border:1px solid var(--border2);color:var(--text);padding:8px 12px;border-radius:6px;font-family:var(--mono);font-size:12px;width:100%;outline:none;cursor:pointer}
+
+/* Stepper buttons */
+.stepper{display:flex;gap:6px;align-items:center}
+.stepper-val{background:var(--surf3);border:1px solid var(--border2);color:var(--text);width:52px;text-align:center;padding:6px;border-radius:6px;font-family:var(--mono);font-size:15px;font-weight:700}
+.stepper-btn{background:var(--surf3);border:1px solid var(--border2);color:var(--muted);width:28px;height:28px;border-radius:5px;cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center;transition:.15s;user-select:none}
+.stepper-btn:hover{color:var(--accent);border-color:var(--accent)}
+
+/* Solve button */
+.btn-solve{background:linear-gradient(135deg,#a78bfa,#8b5cf6);color:white;border:none;padding:12px 20px;border-radius:8px;font-family:var(--mono);font-size:12px;font-weight:700;cursor:pointer;transition:.2s;width:100%;letter-spacing:.04em;display:flex;align-items:center;justify-content:center;gap:8px}
+.btn-solve:hover{background:linear-gradient(135deg,#8b5cf6,#7c3aed);transform:translateY(-1px)}
+.btn-solve:active{transform:translateY(0)}
+.btn-reset{background:var(--surf2);border:1px solid var(--border2);color:var(--muted);padding:8px 16px;border-radius:6px;font-family:var(--mono);font-size:11px;cursor:pointer;transition:.15s;width:100%}
+.btn-reset:hover{color:var(--text);border-color:var(--muted)}
+
+/* G.L. indicator */
+.gl-box{background:var(--surf3);border:1px solid var(--border);border-radius:6px;padding:10px;text-align:center}
+.gl-label{font-family:var(--mono);font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px}
+.gl-val{font-family:var(--mono);font-size:22px;font-weight:700;transition:.3s}
+.gl-ok{color:var(--green)}
+.gl-warn{color:var(--yellow)}
+.gl-bad{color:var(--red)}
+.gl-hint{font-family:var(--mono);font-size:9px;color:var(--muted);margin-top:3px}
+
+/* ── Work area ── */
+.work-area{padding:24px;display:flex;flex-direction:column;gap:20px}
+
+/* PFD mini diagram */
+.pfd-section{background:var(--surf);border:1px solid var(--border);border-radius:10px;overflow:hidden}
+.pfd-header{background:var(--surf2);padding:10px 16px;border-bottom:1px solid var(--border);font-family:var(--mono);font-size:10px;font-weight:700;color:var(--muted);letter-spacing:.1em;text-transform:uppercase}
+.pfd-canvas{padding:16px;min-height:90px;display:flex;align-items:center;justify-content:center;overflow-x:auto}
+#pfd-svg{transition:all .3s}
+
+/* Stream grid */
+.streams-grid{display:grid;gap:12px}
+
+/* Stream block */
+.stream-block{background:var(--surf2);border:1px solid var(--border);border-radius:8px;overflow:hidden;transition:.15s}
+.stream-block:hover{border-color:var(--border2)}
+.stream-header{padding:10px 14px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border)}
+.stream-badge{font-family:var(--mono);font-size:9px;font-weight:700;padding:2px 8px;border-radius:3px;letter-spacing:.06em}
+.stream-name{font-family:var(--mono);font-size:12px;font-weight:700;color:var(--text)}
+.stream-type-badge{margin-left:auto;font-family:var(--mono);font-size:9px;font-weight:700;padding:2px 8px;border-radius:3px}
+.entrada-badge{background:#38bdf810;color:#38bdf8;border:1px solid #38bdf830}
+.salida-badge{background:#fb923c10;color:#fb923c;border:1px solid #fb923c30}
+
+.stream-fields{padding:14px;display:grid;gap:8px}
+.field-grid{display:grid;grid-template-columns:auto 1fr auto;gap:8px;align-items:center}
+.field-grid-label{font-family:var(--mono);font-size:10px;color:var(--muted);text-align:right;white-space:nowrap}
+.field-grid-unit{font-family:var(--mono);font-size:9px;color:var(--muted2);white-space:nowrap}
+.stream-input{background:var(--surf3);border:1px solid var(--border2);color:var(--text);padding:6px 10px;border-radius:5px;font-family:var(--mono);font-size:12px;width:100%;outline:none;transition:.15s;-moz-appearance:textfield}
+.stream-input::-webkit-inner-spin-button,.stream-input::-webkit-outer-spin-button{-webkit-appearance:none}
+.stream-input:focus{border-color:var(--accent)}
+.stream-input.unknown{border-style:dashed;color:var(--yellow)}
+.stream-input.unknown::placeholder{color:var(--muted2)}
+.fracs-row{display:grid;gap:6px}
+.frac-comp{display:grid;grid-template-columns:24px 1fr 56px;gap:6px;align-items:center}
+.comp-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.frac-label{font-family:var(--mono);font-size:10px;color:var(--muted)}
+.sum-indicator{display:flex;justify-content:flex-end;align-items:center;gap:6px;padding-top:4px}
+.sum-label{font-family:var(--mono);font-size:9px;color:var(--muted)}
+.sum-val{font-family:var(--mono);font-size:10px;font-weight:700}
+.sum-ok{color:var(--green)}
+.sum-warn{color:var(--yellow)}
+
+/* Unknown checkbox */
+.unk-row{display:flex;align-items:center;gap:8px;margin-top:4px}
+.unk-label{font-family:var(--mono);font-size:9px;color:var(--muted)}
+.unk-check{accent-color:var(--accent);cursor:pointer;width:14px;height:14px}
+
+/* ── Results panel ── */
+.results-section{background:var(--surf);border:1px solid var(--border);border-radius:10px;overflow:hidden}
+.results-header{background:var(--surf2);padding:10px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;font-family:var(--mono);font-size:10px;font-weight:700;color:var(--muted);letter-spacing:.1em;text-transform:uppercase}
+.results-body{padding:20px;display:flex;flex-direction:column;gap:16px}
+
+/* Equation lines */
+.eq-section-title{font-family:var(--mono);font-size:9px;font-weight:700;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px}
+.eq-block{background:var(--surf2);border:1px solid var(--border);border-radius:6px;overflow:hidden;margin-bottom:10px}
+.eq-row{display:grid;grid-template-columns:140px 1fr;gap:0;border-bottom:1px solid var(--border)}
+.eq-row:last-child{border-bottom:none}
+.eq-lhs{font-family:var(--mono);font-size:10px;color:var(--muted);padding:7px 12px;background:var(--surf3);display:flex;align-items:center}
+.eq-rhs{font-family:var(--mono);font-size:11px;color:var(--text);padding:7px 12px;display:flex;align-items:center;gap:6px}
+.eq-rhs .val{color:var(--accent);font-weight:700}
+.eq-rhs .ok{color:var(--green)}
+
+/* Result table */
+.res-table{width:100%;border-collapse:collapse;font-family:var(--mono);font-size:11px}
+.res-table th{background:var(--surf3);padding:8px 12px;text-align:left;font-size:9px;color:var(--muted);font-weight:700;letter-spacing:.06em;text-transform:uppercase;border-bottom:1px solid var(--border)}
+.res-table td{padding:8px 12px;border-bottom:1px solid var(--border)}
+.res-table tr:last-child td{border-bottom:none}
+.res-table tr:hover td{background:#ffffff04}
+.solved-val{color:var(--yellow);font-weight:700}
+.given-val{color:var(--text)}
+
+/* Status strip */
+.status-strip{padding:10px 16px;font-family:var(--mono);font-size:11px;display:flex;align-items:center;gap:8px;border-top:1px solid var(--border)}
+.status-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.strip-ok .status-dot{background:var(--green);box-shadow:0 0 6px var(--green)}
+.strip-warn .status-dot{background:var(--yellow);box-shadow:0 0 6px var(--yellow)}
+.strip-err .status-dot{background:var(--red);box-shadow:0 0 6px var(--red)}
+.strip-idle .status-dot{background:var(--muted)}
+.strip-ok .status-txt{color:var(--green)}
+.strip-warn .status-txt{color:var(--yellow)}
+.strip-err .status-txt{color:var(--red)}
+.strip-idle .status-txt{color:var(--muted)}
+
+/* Result placeholder */
+.result-placeholder{text-align:center;padding:32px;font-family:var(--mono);font-size:11px;color:var(--muted2)}
+.result-placeholder div{font-size:28px;margin-bottom:10px;opacity:.4}
+
+/* Component color dots */
+.c0{background:var(--c0)} .c1{background:var(--c1)} .c2{background:var(--c2)} .c3{background:var(--c3)}
+.t0{color:var(--c0)} .t1{color:var(--c1)} .t2{color:var(--c2)} .t3{color:var(--c3)}
+
+@media(max-width:900px){
+  .main{grid-template-columns:1fr}
+  .sidebar{position:static;height:auto}
+  .work-area{padding:16px}
+}
+</style>
 </head>
 <body>
-<div class="calc-container">
-    <div class="header">
-        <h1>📐 Calculadora Universal de Balances de Materia (No Reactivos)</h1>
-        <a href="simuladores.html">← Volver a Simuladores</a>
+
+<div class="header">
+  <div class="header-icon">🧮</div>
+  <div>
+    <div class="header-title">CALCULADORA UNIVERSAL — Balances de Materia</div>
+    <div class="header-sub">Procesos no reactivos · Estado estacionario · Hasta 5 corrientes y 4 componentes</div>
+  </div>
+  <div class="header-right">
+    <span class="tag">G.L. = 0</span>
+    <a href="simuladores.html" class="btn-back">← Simuladores</a>
+  </div>
+</div>
+
+<div class="main">
+
+  <!-- ═══ SIDEBAR ═══ -->
+  <div class="sidebar">
+
+    <div>
+      <div class="sidebar-title">Configuración del sistema</div>
     </div>
-    <div class="config-panel">
-        <div class="param-row">
-            <div class="param-group">
-                <label>Número de componentes (máx 4):</label>
-                <input type="number" id="num_comps" value="2" min="1" max="4" step="1">
-            </div>
-            <div class="param-group">
-                <label>Número de corrientes de ENTRADA:</label>
-                <input type="number" id="num_entradas" value="2" min="1" max="5" step="1">
-            </div>
-            <div class="param-group">
-                <label>Número de corrientes de SALIDA:</label>
-                <input type="number" id="num_salidas" value="1" min="1" max="5" step="1">
-            </div>
-            <div><button id="btnReiniciar">⟳ Configurar</button></div>
+
+    <div class="config-section">
+
+      <div class="field-row">
+        <div class="field-label">Componentes</div>
+        <div class="stepper">
+          <div class="stepper-btn" onclick="stepVal('nComp',-1,1,4)">−</div>
+          <div class="stepper-val" id="nComp-disp">2</div>
+          <div class="stepper-btn" onclick="stepVal('nComp',+1,1,4)">+</div>
+          <span style="font-family:var(--mono);font-size:10px;color:var(--muted);margin-left:6px">máx 4</span>
         </div>
+      </div>
+
+      <div class="field-row">
+        <div class="field-label">Corrientes de entrada</div>
+        <div class="stepper">
+          <div class="stepper-btn" onclick="stepVal('nEnt',-1,1,5)">−</div>
+          <div class="stepper-val" id="nEnt-disp">2</div>
+          <div class="stepper-btn" onclick="stepVal('nEnt',+1,1,5)">+</div>
+          <span style="font-family:var(--mono);font-size:10px;color:var(--muted);margin-left:6px">máx 5</span>
+        </div>
+      </div>
+
+      <div class="field-row">
+        <div class="field-label">Corrientes de salida</div>
+        <div class="stepper">
+          <div class="stepper-btn" onclick="stepVal('nSal',-1,1,5)">−</div>
+          <div class="stepper-val" id="nSal-disp">1</div>
+          <div class="stepper-btn" onclick="stepVal('nSal',+1,1,5)">+</div>
+          <span style="font-family:var(--mono);font-size:10px;color:var(--muted);margin-left:6px">máx 5</span>
+        </div>
+      </div>
+
+      <div class="field-row">
+        <div class="field-label">Unidades de caudal</div>
+        <select class="field-select" id="unidad">
+          <option value="kg/h">kg/h</option>
+          <option value="kmol/h">kmol/h</option>
+          <option value="lb/h">lb/h</option>
+          <option value="ton/h">ton/h</option>
+          <option value="kg/min">kg/min</option>
+        </select>
+      </div>
+
     </div>
-    <div id="corrientes-container" class="corrientes-panel"></div>
-    <div id="resultados-panel" class="resultados">
-        <strong>📊 Resultados y ecuaciones:</strong><br>
-        Configure el problema y presione "Resolver".
+
+    <!-- G.L. indicator -->
+    <div class="gl-box">
+      <div class="gl-label">Grados de libertad</div>
+      <div class="gl-val gl-idle" id="gl-val">—</div>
+      <div class="gl-hint" id="gl-hint">Configure el sistema</div>
     </div>
+
+    <button class="btn-solve" onclick="buildForms()">⟳ Generar formulario</button>
+
+    <button class="btn-solve" id="btn-resolver" onclick="resolverBalances()" style="background:linear-gradient(135deg,#34d399,#10b981)">
+      🔍 Resolver balances
+    </button>
+
+    <button class="btn-reset" onclick="resetForm()">↺ Reiniciar todo</button>
+
+    <!-- Legend -->
+    <div style="background:var(--surf2);border:1px solid var(--border);border-radius:8px;padding:12px">
+      <div class="sidebar-title" style="margin-bottom:8px">Leyenda de componentes</div>
+      <div id="comp-legend" style="display:flex;flex-direction:column;gap:6px;font-family:var(--mono);font-size:10px"></div>
+    </div>
+
+    <!-- Instructions -->
+    <div style="background:var(--surf2);border:1px solid var(--border);border-radius:8px;padding:12px">
+      <div class="sidebar-title" style="margin-bottom:8px">Instrucciones</div>
+      <div style="font-family:var(--mono);font-size:10px;color:var(--muted);display:flex;flex-direction:column;gap:5px;line-height:1.5">
+        <span>1. Configure componentes y corrientes.</span>
+        <span>2. Genere el formulario.</span>
+        <span>3. Ingrese datos conocidos.</span>
+        <span>4. Deje en blanco los valores <span style="color:var(--yellow)">incógnita</span>.</span>
+        <span>5. Presione Resolver.</span>
+        <span style="color:var(--muted2); margin-top:4px">Fracciones: suma = 1 por corriente.</span>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ═══ WORK AREA ═══ -->
+  <div class="work-area">
+
+    <!-- PFD dinámico -->
+    <div class="pfd-section">
+      <div class="pfd-header">⊞ Diagrama de flujo del sistema</div>
+      <div class="pfd-canvas">
+        <svg id="pfd-svg" viewBox="0 0 600 80" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:700px;height:80px">
+          <rect width="600" height="80" fill="transparent"/>
+          <text x="300" y="44" text-anchor="middle" fill="#1e2d42" font-family="JetBrains Mono, monospace" font-size="11">Configure el sistema y genere el formulario</text>
+        </svg>
+      </div>
+    </div>
+
+    <!-- Streams container -->
+    <div id="streams-container" class="streams-grid" style="grid-template-columns: repeat(auto-fit, minmax(280px, 1fr))"></div>
+
+    <!-- Results -->
+    <div class="results-section" id="results-section">
+      <div class="results-header">
+        <span>📊</span> Resultados y verificación de balances
+      </div>
+      <div class="results-body" id="results-body">
+        <div class="result-placeholder">
+          <div>🔍</div>
+          Configure el problema, ingrese los datos conocidos y presione <strong>Resolver balances</strong>.
+        </div>
+      </div>
+      <div class="status-strip strip-idle" id="status-strip">
+        <div class="status-dot"></div>
+        <span class="status-txt">Esperando datos</span>
+      </div>
+    </div>
+
+  </div>
+
 </div>
 
 <script>
-    let numComps = 2, numEntradas = 2, numSalidas = 1;
-    const compNames = ['A', 'B', 'C', 'D'];
+// ══════════════════════════════════════════
+//  State
+// ══════════════════════════════════════════
+let cfg = { nComp: 2, nEnt: 2, nSal: 1 };
+const compNames  = ['A', 'B', 'C', 'D'];
+const compColors = ['#38bdf8','#fb923c','#34d399','#f87171'];
+const compClasses = ['c0','c1','c2','c3'];
 
-    function generarFormulario() {
-        numComps = parseInt(document.getElementById('num_comps').value);
-        numEntradas = parseInt(document.getElementById('num_entradas').value);
-        numSalidas = parseInt(document.getElementById('num_salidas').value);
-        const container = document.getElementById('corrientes-container');
-        container.innerHTML = '';
-        
-        // Entradas
-        for (let i = 0; i < numEntradas; i++) {
-            const div = document.createElement('div');
-            div.className = 'corriente-block';
-            div.innerHTML = `<div class="corriente-title">📥 ENTRADA ${i+1}</div>
-                <div class="comp-row"><label>Caudal (kg/h):</label> <input type="number" id="E_${i}_flow" value="${i===0?100:50}" step="10"></div>`;
-            for (let c = 0; c < numComps; c++) {
-                let defaultValue = (c===0 && i===0) ? 0.5 : (c===1 && i===0) ? 0.5 : (c===0?0.3:0.7);
-                if (i===1 && c===0) defaultValue = 0.6;
-                if (i===1 && c===1) defaultValue = 0.4;
-                div.innerHTML += `<div class="comp-row"><label>Fracción ${compNames[c]}:</label> <input type="number" id="E_${i}_comp_${c}" value="${defaultValue}" step="0.01" min="0" max="1"></div>`;
-            }
-            container.appendChild(div);
-        }
-        // Salidas
-        for (let i = 0; i < numSalidas; i++) {
-            const div = document.createElement('div');
-            div.className = 'corriente-block';
-            div.innerHTML = `<div class="corriente-title">📤 SALIDA ${i+1}</div>
-                <div class="comp-row"><label>Caudal (kg/h):</label> <input type="number" id="S_${i}_flow" value="${i===0?120:''}" step="10" placeholder="?? desconocido"></div>`;
-            for (let c = 0; c < numComps; c++) {
-                let defaultValue = (c===0 && i===0) ? 0.4 : (c===1 && i===0) ? 0.6 : 0;
-                div.innerHTML += `<div class="comp-row"><label>Fracción ${compNames[c]}:</label> <input type="number" id="S_${i}_comp_${c}" value="${defaultValue}" step="0.01" min="0" max="1" placeholder="?"></div>`;
-            }
-            container.appendChild(div);
-        }
-        const btnResolver = document.createElement('button');
-        btnResolver.innerText = '🔍 Resolver Balances';
-        btnResolver.style.margin = '20px auto';
-        btnResolver.style.display = 'block';
-        btnResolver.onclick = resolverBalances;
-        container.appendChild(btnResolver);
-    }
+// ── Stepper ──
+function stepVal(key, delta, min, max) {
+  const v = Math.min(max, Math.max(min, cfg[key] + delta));
+  cfg[key] = v;
+  document.getElementById(key + '-disp').textContent = v;
+  updateGL();
+  updateLegend();
+}
 
-    function resolverBalances() {
-        let entradas = [];
-        let salidas = [];
-        // Leer entradas
-        for (let i = 0; i < numEntradas; i++) {
-            let flow = parseFloat(document.getElementById(`E_${i}_flow`).value);
-            if (isNaN(flow)) flow = 0;
-            let comps = [];
-            let sumFrac = 0;
-            for (let c = 0; c < numComps; c++) {
-                let frac = parseFloat(document.getElementById(`E_${i}_comp_${c}`).value);
-                if (isNaN(frac)) frac = 0;
-                comps.push(frac);
-                sumFrac += frac;
-            }
-            if (Math.abs(sumFrac - 1) > 0.01) {
-                alert(`Corriente entrada ${i+1}: suma de fracciones = ${sumFrac}. Debe ser 1.`);
-                return;
-            }
-            entradas.push({ flow, comps });
-        }
-        for (let i = 0; i < numSalidas; i++) {
-            let flowInput = document.getElementById(`S_${i}_flow`).value;
-            let flow = (flowInput === "" || isNaN(parseFloat(flowInput))) ? null : parseFloat(flowInput);
-            let comps = [];
-            let sumFrac = 0;
-            for (let c = 0; c < numComps; c++) {
-                let fracInput = document.getElementById(`S_${i}_comp_${c}`).value;
-                let frac = (fracInput === "" || isNaN(parseFloat(fracInput))) ? null : parseFloat(fracInput);
-                comps.push(frac);
-                if (frac !== null) sumFrac += frac;
-            }
-            if (comps.every(f => f !== null) && Math.abs(sumFrac - 1) > 0.01) {
-                alert(`Salida ${i+1}: suma de fracciones = ${sumFrac}. Debe ser 1.`);
-                return;
-            }
-            salidas.push({ flow, comps });
-        }
+// ── G.L. ──
+function updateGL() {
+  // Simple estimate: unknowns = unknown flows + unknown fracs per stream
+  // For display purposes only — actual GL checked at solve time
+  const nStreams = cfg.nEnt + cfg.nSal;
+  const ecuaciones = 1 + cfg.nComp; // global + per-component
+  const incognitas = cfg.nSal; // assume all salida flows unknown
+  const gl = incognitas - (ecuaciones > incognitas ? incognitas : 0);
+  const glEl = document.getElementById('gl-val');
+  const glHint = document.getElementById('gl-hint');
+  glEl.textContent = '?';
+  glEl.className = 'gl-val gl-idle';
+  glHint.textContent = 'Genere el formulario para calcular';
+}
 
-        // Construir sistema de ecuaciones: balance global y por componentes
-        // Variables desconocidas: caudales de salida (si no se especifican) y fracciones faltantes
-        // Estrategia simplificada: resolver caudales desconocidos mediante balances global y componentes conocidos
-        let incognitasCaudal = [];
-        let ecuaciones = [];
-        let totalEntrada = entradas.reduce((sum, e) => sum + e.flow, 0);
-        
-        // Primero, determinar qué caudales de salida son desconocidos
-        let salidasConCaudal = salidas.map(s => s.flow !== null);
-        let numCaudalesDesc = salidasConCaudal.filter(v => !v).length;
-        
-        // Si hay más de una incógnita de caudal, usar balances de componentes
-        let flujosSalida = salidas.map(s => s.flow);
-        let sistemaEcuaciones = [];
-        let terminosIndependientes = [];
-        
-        // Balance global: suma caudales salida = totalEntrada
-        let indicesDesc = [];
-        for (let i = 0; i < salidas.length; i++) {
-            if (flujosSalida[i] === null) indicesDesc.push(i);
-        }
-        if (indicesDesc.length === 1) {
-            // Fácil: despejar caudal faltante
-            let sumaConocida = 0;
-            for (let i = 0; i < salidas.length; i++) {
-                if (flujosSalida[i] !== null) sumaConocida += flujosSalida[i];
-            }
-            let caudalDesc = totalEntrada - sumaConocida;
-            flujosSalida[indicesDesc[0]] = caudalDesc;
-        } else if (indicesDesc.length > 1) {
-            // Usar balances de componentes
-            // Construir matriz: para cada componente c, sum(frac_salida * flujo_salida) = sum(frac_entrada * flujo_entrada)
-            let A = [];
-            let b = [];
-            for (let c = 0; c < numComps; c++) {
-                let ladoDerecho = 0;
-                for (let e of entradas) ladoDerecho += e.flow * e.comps[c];
-                let ecuacion = [];
-                for (let i = 0; i < salidas.length; i++) {
-                    if (flujosSalida[i] === null) {
-                        let frac = salidas[i].comps[c];
-                        if (frac === null) {
-                            alert(`Falta composición para componente ${compNames[c]} en salida ${i+1}. Complete o deje caudal fijo.`);
-                            return;
-                        }
-                        ecuacion.push(frac);
-                    } else {
-                        // término conocido pasa al lado derecho
-                        ladoDerecho -= flujosSalida[i] * (salidas[i].comps[c] !== null ? salidas[i].comps[c] : 0);
-                    }
-                }
-                if (ecuacion.length > 0) {
-                    A.push(ecuacion);
-                    b.push(ladoDerecho);
-                }
-            }
-            if (A.length === indicesDesc.length) {
-                // resolver sistema lineal
-                let sol = resolverSistema(A, b);
-                if (sol) {
-                    for (let idx = 0; idx < indicesDesc.length; idx++) {
-                        flujosSalida[indicesDesc[idx]] = sol[idx];
-                    }
-                } else {
-                    document.getElementById('resultados-panel').innerHTML += '<div class="warning">⚠️ Sistema sin solución única. Revise datos.</div>';
-                    return;
-                }
-            } else {
-                document.getElementById('resultados-panel').innerHTML += '<div class="warning">⚠️ Número de ecuaciones insuficiente. Defina más composiciones.</div>';
-                return;
-            }
-        }
-        
-        // Ahora calcular fracciones faltantes en salidas
-        for (let i = 0; i < salidas.length; i++) {
-            let sal = salidas[i];
-            let flujo = flujosSalida[i];
-            let compsFaltantes = [];
-            for (let c = 0; c < numComps; c++) {
-                if (sal.comps[c] === null) compsFaltantes.push(c);
-            }
-            if (compsFaltantes.length === 1) {
-                let c = compsFaltantes[0];
-                let sumaConocida = 0;
-                for (let k = 0; k < numComps; k++) {
-                    if (k !== c && sal.comps[k] !== null) sumaConocida += sal.comps[k];
-                }
-                let nuevaFrac = 1 - sumaConocida;
-                sal.comps[c] = nuevaFrac;
-            } else if (compsFaltantes.length > 1) {
-                // usar balance de componente específico
-                for (let c of compsFaltantes) {
-                    let acumEntrada = 0;
-                    for (let e of entradas) acumEntrada += e.flow * e.comps[c];
-                    let acumSalidaConocida = 0;
-                    for (let j = 0; j < salidas.length; j++) {
-                        if (j !== i && salidas[j].comps[c] !== null) {
-                            acumSalidaConocida += flujosSalida[j] * salidas[j].comps[c];
-                        }
-                    }
-                    let fracDesc = (acumEntrada - acumSalidaConocida) / flujo;
-                    sal.comps[c] = fracDesc;
-                }
-            }
-        }
-        
-        // Mostrar resultados y ecuaciones paso a paso
-        let html = `<strong>📐 ECUACIONES APLICADAS</strong><br>`;
-        html += `<div class="ecuacion">Balance global: Σ(m_entrada) = Σ(m_salida)<br>`;
-        html += `Total entrada = ${totalEntrada.toFixed(2)} kg/h</div>`;
-        for (let c = 0; c < numComps; c++) {
-            let entradaComp = entradas.reduce((sum, e) => sum + e.flow * e.comps[c], 0);
-            let salidaComp = 0;
-            for (let i=0; i<salidas.length; i++) {
-                salidaComp += flujosSalida[i] * salidas[i].comps[c];
-            }
-            html += `<div class="ecuacion">Balance componente ${compNames[c]}: ${entradaComp.toFixed(3)} = ${salidaComp.toFixed(3)} kg/h</div>`;
-        }
-        html += `<strong>📊 RESULTADOS FINALES</strong><br><table class="tabla-resultados"><tr><th>Corriente</th><th>Caudal (kg/h)</th>`;
-        for (let c=0; c<numComps; c++) html += `<th>${compNames[c]}</th>`;
-        html += `</tr>`;
-        for (let i=0; i<entradas.length; i++) {
-            html += `<tr><td>Entrada ${i+1}</td><td>${entradas[i].flow.toFixed(2)}</td>`;
-            for (let c=0; c<numComps; c++) html += `<td>${entradas[i].comps[c].toFixed(4)}</td>`;
-            html += `</tr>`;
-        }
-        for (let i=0; i<salidas.length; i++) {
-            html += `<tr><td>Salida ${i+1}</td><td>${flujosSalida[i].toFixed(2)}</td>`;
-            for (let c=0; c<numComps; c++) html += `<td>${salidas[i].comps[c].toFixed(4)}</td>`;
-            html += `</tr>`;
-        }
-        html += `</table>`;
-        document.getElementById('resultados-panel').innerHTML = html;
+function updateLegend() {
+  const el = document.getElementById('comp-legend');
+  el.innerHTML = '';
+  for (let c = 0; c < cfg.nComp; c++) {
+    el.innerHTML += `<div style="display:flex;align-items:center;gap:8px">
+      <div style="width:8px;height:8px;border-radius:50%;background:${compColors[c]};flex-shrink:0"></div>
+      <span style="color:${compColors[c]}">Comp. ${compNames[c]}</span>
+    </div>`;
+  }
+}
+
+// ══════════════════════════════════════════
+//  Build forms
+// ══════════════════════════════════════════
+function buildForms() {
+  updateLegend();
+  buildPFD();
+  buildStreamForms();
+  document.getElementById('results-body').innerHTML = `<div class="result-placeholder"><div>🔍</div>Complete los datos conocidos y presione <strong>Resolver balances</strong>.</div>`;
+  setStatus('idle','Formulario generado — ingrese los valores conocidos');
+}
+
+function buildPFD() {
+  const nE = cfg.nEnt, nS = cfg.nSal;
+  const W = 700, H = 80;
+  const equipX = W / 2 - 30, equipW = 60, equipH = 50, equipY = 15;
+  let svg = `<defs>
+    <marker id="ae" markerWidth="6" markerHeight="6" refX="5" refY="2.5" orient="auto"><path d="M0,0 L0,5 L6,2.5 z" fill="#38bdf8"/></marker>
+    <marker id="as" markerWidth="6" markerHeight="6" refX="5" refY="2.5" orient="auto"><path d="M0,0 L0,5 L6,2.5 z" fill="#fb923c"/></marker>
+  </defs>
+  <rect width="${W}" height="${H}" fill="transparent"/>`;
+
+  // Equipment box (mixer/separator generic)
+  svg += `<rect x="${equipX}" y="${equipY}" width="${equipW}" height="${equipH}" rx="6" fill="#111a28" stroke="#a78bfa50" stroke-width="1.5"/>
+  <text x="${equipX + equipW/2}" y="${equipY + 20}" text-anchor="middle" fill="#6b3fa0" font-family="JetBrains Mono, monospace" font-size="7" font-weight="700">PROCESO</text>
+  <text x="${equipX + equipW/2}" y="${equipY + 32}" text-anchor="middle" fill="#4a2a70" font-family="JetBrains Mono, monospace" font-size="6">SISTEMA</text>`;
+
+  // Entrada streams (left side)
+  const eSpacing = H / (nE + 1);
+  for (let i = 0; i < nE; i++) {
+    const y = eSpacing * (i + 1);
+    const x0 = 10, x1 = equipX - 2;
+    svg += `<rect x="${x0}" y="${y - 12}" width="80" height="22" rx="3" fill="#38bdf808" stroke="#38bdf840" stroke-width="1"/>
+    <text x="${x0 + 40}" y="${y - 2}" text-anchor="middle" fill="#38bdf8" font-family="JetBrains Mono, monospace" font-size="7" font-weight="700">ENT-${i+1}</text>
+    <text x="${x0 + 40}" y="${y + 7}" text-anchor="middle" fill="#4a6070" font-family="JetBrains Mono, monospace" font-size="6">Corriente ${i+1}</text>
+    <line x1="${x0+80}" y1="${y}" x2="${x1}" y2="${y}" stroke="#38bdf8" stroke-width="1.5" marker-end="url(#ae)"/>`;
+  }
+
+  // Salida streams (right side)
+  const sSpacing = H / (nS + 1);
+  for (let i = 0; i < nS; i++) {
+    const y = sSpacing * (i + 1);
+    const x0 = equipX + equipW + 2, x1 = W - 90;
+    svg += `<line x1="${x0}" y1="${y}" x2="${x1 - 2}" y2="${y}" stroke="#fb923c" stroke-width="1.5" marker-end="url(#as)"/>
+    <rect x="${x1}" y="${y - 12}" width="80" height="22" rx="3" fill="#fb923c08" stroke="#fb923c40" stroke-width="1"/>
+    <text x="${x1 + 40}" y="${y - 2}" text-anchor="middle" fill="#fb923c" font-family="JetBrains Mono, monospace" font-size="7" font-weight="700">SAL-${i+1}</text>
+    <text x="${x1 + 40}" y="${y + 7}" text-anchor="middle" fill="#4a6070" font-family="JetBrains Mono, monospace" font-size="6">Corriente ${nE+i+1}</text>`;
+  }
+
+  document.getElementById('pfd-svg').innerHTML = svg;
+  document.getElementById('pfd-svg').setAttribute('viewBox', `0 0 ${W} ${H}`);
+}
+
+function buildStreamForms() {
+  const container = document.getElementById('streams-container');
+  container.innerHTML = '';
+  const unidad = document.getElementById('unidad').value;
+
+  // Entradas
+  for (let i = 0; i < cfg.nEnt; i++) {
+    container.appendChild(createStreamBlock('E', i, 'ENTRADA', unidad));
+  }
+  // Salidas
+  for (let i = 0; i < cfg.nSal; i++) {
+    container.appendChild(createStreamBlock('S', i, 'SALIDA', unidad));
+  }
+}
+
+function createStreamBlock(tipo, idx, label, unidad) {
+  const isEntrada = tipo === 'E';
+  const streamNum = isEntrada ? idx + 1 : cfg.nEnt + idx + 1;
+  const colorClass = isEntrada ? 'entrada-badge' : 'salida-badge';
+  const borderColor = isEntrada ? '#38bdf8' : '#fb923c';
+  const typeLabel = isEntrada ? `ENT-${idx+1}` : `SAL-${idx+1}`;
+
+  const div = document.createElement('div');
+  div.className = 'stream-block';
+  div.style.borderTop = `2px solid ${borderColor}`;
+
+  // Default flows for demo
+  const defaultFlow = isEntrada
+    ? (idx === 0 ? 100 : 50)
+    : '';
+
+  let fracsHtml = '';
+  for (let c = 0; c < cfg.nComp; c++) {
+    const defaultFrac = isEntrada
+      ? (cfg.nComp === 1 ? 1.0 : (c === 0 ? (idx === 0 ? 0.5 : 0.3) : (idx === 0 ? 0.5 : 0.7)))
+      : '';
+    fracsHtml += `
+      <div class="frac-comp">
+        <div class="comp-dot ${compClasses[c]}" style="margin:0 auto"></div>
+        <span class="frac-label">Comp. ${compNames[c]}</span>
+        <input type="number" class="stream-input ${defaultFrac===''?'unknown':''}"
+          id="${tipo}_${idx}_comp_${c}"
+          value="${defaultFrac}"
+          placeholder="?"
+          min="0" max="1" step="0.001"
+          oninput="onFracInput('${tipo}',${idx},${c})">
+      </div>`;
+  }
+
+  div.innerHTML = `
+    <div class="stream-header">
+      <span class="stream-badge" style="background:${borderColor}18;color:${borderColor};border:1px solid ${borderColor}30">${typeLabel}</span>
+      <span class="stream-name">Corriente ${streamNum}</span>
+      <span class="stream-type-badge ${colorClass}">${isEntrada ? '📥 Entrada' : '📤 Salida'}</span>
+    </div>
+    <div class="stream-fields">
+      <div class="field-grid">
+        <span class="field-grid-label">Caudal</span>
+        <input type="number" class="stream-input ${defaultFlow===''?'unknown':''}"
+          id="${tipo}_${idx}_flow"
+          value="${defaultFlow}"
+          placeholder="? (incógnita)"
+          min="0" step="0.1">
+        <span class="field-grid-unit">${unidad}</span>
+      </div>
+      <div class="fracs-row" style="margin-top:6px">
+        <div style="font-family:var(--mono);font-size:9px;color:var(--muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:.06em">Fracciones másicas</div>
+        ${fracsHtml}
+      </div>
+      <div class="sum-indicator" id="sum-${tipo}-${idx}">
+        <span class="sum-label">Σ fracciones =</span>
+        <span class="sum-val sum-ok" id="sumval-${tipo}-${idx}">—</span>
+      </div>
+    </div>`;
+
+  return div;
+}
+
+function onFracInput(tipo, idx, c) {
+  let sum = 0, count = 0;
+  for (let k = 0; k < cfg.nComp; k++) {
+    const el = document.getElementById(`${tipo}_${idx}_comp_${k}`);
+    if (el && el.value !== '') { sum += parseFloat(el.value)||0; count++; }
+  }
+  const valEl = document.getElementById(`sumval-${tipo}-${idx}`);
+  if (valEl && count > 0) {
+    valEl.textContent = sum.toFixed(4);
+    valEl.className = 'sum-val ' + (Math.abs(sum - 1) < 0.015 ? 'sum-ok' : 'sum-warn');
+  }
+}
+
+// ══════════════════════════════════════════
+//  Solve
+// ══════════════════════════════════════════
+function resolverBalances() {
+  const unidad = document.getElementById('unidad').value;
+
+  // Read inputs
+  let entradas = [], salidas = [];
+  for (let i = 0; i < cfg.nEnt; i++) {
+    const flowV = document.getElementById(`E_${i}_flow`).value;
+    let flow = flowV === '' ? null : parseFloat(flowV);
+    let comps = [];
+    for (let c = 0; c < cfg.nComp; c++) {
+      const fv = document.getElementById(`E_${i}_comp_${c}`).value;
+      comps.push(fv === '' ? null : parseFloat(fv));
     }
-    
-    function resolverSistema(A, b) {
-        // A es matriz cuadrada, resolver por Cramer simple (hasta 5x5)
-        let n = A.length;
-        let det = determinante(A);
-        if (Math.abs(det) < 1e-6) return null;
-        let sol = [];
-        for (let i = 0; i < n; i++) {
-            let Ai = A.map(row => [...row]);
-            for (let j = 0; j < n; j++) Ai[j][i] = b[j];
-            let detAi = determinante(Ai);
-            sol.push(detAi / det);
-        }
-        return sol;
+    entradas.push({ flow, comps });
+  }
+  for (let i = 0; i < cfg.nSal; i++) {
+    const flowV = document.getElementById(`S_${i}_flow`).value;
+    let flow = flowV === '' ? null : parseFloat(flowV);
+    let comps = [];
+    for (let c = 0; c < cfg.nComp; c++) {
+      const fv = document.getElementById(`S_${i}_comp_${c}`).value;
+      comps.push(fv === '' ? null : parseFloat(fv));
     }
-    
-    function determinante(matriz) {
-        let n = matriz.length;
-        if (n === 1) return matriz[0][0];
-        if (n === 2) return matriz[0][0]*matriz[1][1] - matriz[0][1]*matriz[1][0];
-        let det = 0;
-        for (let i = 0; i < n; i++) {
-            let submat = [];
-            for (let j = 1; j < n; j++) {
-                let fila = [];
-                for (let k = 0; k < n; k++) if (k !== i) fila.push(matriz[j][k]);
-                submat.push(fila);
-            }
-            det += matriz[0][i] * determinante(submat) * (i % 2 === 0 ? 1 : -1);
-        }
-        return det;
+    salidas.push({ flow, comps });
+  }
+
+  // Validate entrada fractions sum
+  for (let i = 0; i < entradas.length; i++) {
+    const known = entradas[i].comps.filter(v => v !== null);
+    if (known.length === cfg.nComp) {
+      const s = known.reduce((a,b)=>a+b,0);
+      if (Math.abs(s - 1) > 0.02) {
+        showError(`Corriente Entrada ${i+1}: suma de fracciones = ${s.toFixed(4)} (debe ser 1.000). Corrija los valores.`);
+        return;
+      }
+    } else if (known.length === cfg.nComp - 1) {
+      // Auto-fill last fraction
+      const s = known.reduce((a,b)=>a+b,0);
+      const missingIdx = entradas[i].comps.findIndex(v => v === null);
+      entradas[i].comps[missingIdx] = 1 - s;
     }
-    
-    document.getElementById('btnReiniciar').addEventListener('click', generarFormulario);
-    window.addEventListener('load', generarFormulario);
+    if (entradas[i].flow === null) {
+      showError(`El caudal de Entrada ${i+1} no puede ser incógnita. Las entradas deben ser completamente definidas.`);
+      return;
+    }
+  }
+
+  // Auto-fill single missing fraction in salidas
+  for (let i = 0; i < salidas.length; i++) {
+    const known = salidas[i].comps.filter(v => v !== null);
+    if (known.length === cfg.nComp - 1) {
+      const s = known.reduce((a,b)=>a+b,0);
+      const missingIdx = salidas[i].comps.findIndex(v => v === null);
+      salidas[i].comps[missingIdx] = parseFloat((1 - s).toFixed(6));
+    }
+  }
+
+  const totalEntrada = entradas.reduce((s, e) => s + e.flow, 0);
+
+  // Find unknown flows
+  let flujosSalida = salidas.map(s => s.flow);
+  const indicesDesc = flujosSalida.map((v,i)=>v===null?i:-1).filter(i=>i>=0);
+
+  if (indicesDesc.length === 0) {
+    // All known — just verify
+    const totalSalida = flujosSalida.reduce((a,b)=>a+b,0);
+    if (Math.abs(totalEntrada - totalSalida) > 0.01 * totalEntrada) {
+      showError(`Balance global no cierra: Entradas=${totalEntrada.toFixed(3)}, Salidas=${totalSalida.toFixed(3)}. Verifique los datos.`);
+      return;
+    }
+  } else if (indicesDesc.length === 1) {
+    const known = flujosSalida.reduce((s,v,i)=> indicesDesc[0]===i ? s : s+(v||0), 0);
+    flujosSalida[indicesDesc[0]] = totalEntrada - known;
+  } else {
+    // Multiple unknowns: build system using component balances
+    // Each component c gives: sum_i(frac_si * flujo_i_unknown) = RHS_c
+    let A = [], b = [];
+    for (let c = 0; c < cfg.nComp; c++) {
+      let rhs = entradas.reduce((s,e) => s + e.flow * e.comps[c], 0);
+      let row = [];
+      for (let i = 0; i < salidas.length; i++) {
+        if (flujosSalida[i] === null) {
+          const frac = salidas[i].comps[c];
+          if (frac === null) { showError(`Falta la fracción del componente ${compNames[c]} en Salida ${i+1}. Es necesaria para resolver el sistema.`); return; }
+          row.push(frac);
+        } else {
+          rhs -= flujosSalida[i] * (salidas[i].comps[c] !== null ? salidas[i].comps[c] : 0);
+        }
+      }
+      A.push(row);
+      b.push(rhs);
+    }
+    // Use only nUnknown equations
+    A = A.slice(0, indicesDesc.length);
+    b = b.slice(0, indicesDesc.length);
+    const sol = resolverSistema(A, b);
+    if (!sol) { showError('El sistema no tiene solución única. Verifique que G.L. = 0 (suficientes datos conocidos).'); return; }
+    indicesDesc.forEach((si, k) => { flujosSalida[si] = sol[k]; });
+  }
+
+  // Check negative flows
+  if (flujosSalida.some(v => v < -0.001)) {
+    showError(`Resultado con caudal negativo (${flujosSalida.map(v=>v.toFixed(2)).join(', ')} ${unidad}). Los datos son inconsistentes.`);
+    return;
+  }
+
+  // Build results HTML
+  const totalSalida = flujosSalida.reduce((a,b)=>a+b,0);
+  const balanceOK = Math.abs(totalEntrada - totalSalida) < 0.01 * Math.max(totalEntrada, 1);
+
+  let eqHtml = `
+    <div>
+      <div class="eq-section-title">Ecuaciones aplicadas</div>
+      <div class="eq-block">
+        <div class="eq-row">
+          <span class="eq-lhs">Balance global</span>
+          <span class="eq-rhs">∑ m_entrada = ∑ m_salida → <span class="val">${totalEntrada.toFixed(3)}</span> = <span class="val">${totalSalida.toFixed(3)}</span> ${unidad} <span class="${balanceOK?'ok':''}">${balanceOK?'✓':'⚠'}</span></span>
+        </div>`;
+
+  for (let c = 0; c < cfg.nComp; c++) {
+    const lhs = entradas.reduce((s,e) => s + e.flow * e.comps[c], 0);
+    const rhs = flujosSalida.reduce((s,v,i) => s + v * (salidas[i].comps[c]||0), 0);
+    const ok = Math.abs(lhs - rhs) < 0.01 * Math.max(lhs, 1);
+    eqHtml += `<div class="eq-row">
+      <span class="eq-lhs" style="color:${compColors[c]}">Bal. comp. ${compNames[c]}</span>
+      <span class="eq-rhs"><span class="val">${lhs.toFixed(4)}</span> = <span class="val">${rhs.toFixed(4)}</span> ${unidad} <span class="${ok?'ok':''}">${ok?'✓':'≈'}</span></span>
+    </div>`;
+  }
+  eqHtml += `</div></div>`;
+
+  // Results table
+  const wasUnknown = salidas.map((s, i) => ({
+    flow: s.flow === null,
+    comps: s.comps.map(v => v === null)
+  }));
+
+  let tableHtml = `
+    <div>
+      <div class="eq-section-title">Tabla de corrientes — Resultados completos</div>
+      <div style="overflow-x:auto">
+      <table class="res-table">
+        <thead><tr>
+          <th>Corriente</th><th>Tipo</th><th>Caudal (${unidad})</th>
+          ${Array.from({length:cfg.nComp},(_,c)=>`<th style="color:${compColors[c]}">Frac. ${compNames[c]}</th>`).join('')}
+          <th>Verificación</th>
+        </tr></thead>
+        <tbody>`;
+
+  for (let i = 0; i < entradas.length; i++) {
+    const fracSum = entradas[i].comps.reduce((a,b)=>a+b,0);
+    tableHtml += `<tr>
+      <td><span style="color:#38bdf8;font-weight:700">ENT-${i+1}</span></td>
+      <td><span class="stream-type-badge entrada-badge">Entrada</span></td>
+      <td class="given-val">${entradas[i].flow.toFixed(3)}</td>
+      ${entradas[i].comps.map(v=>`<td class="given-val">${v.toFixed(4)}</td>`).join('')}
+      <td style="color:${Math.abs(fracSum-1)<0.01?'var(--green)':'var(--yellow)'}">Σ=${fracSum.toFixed(3)}</td>
+    </tr>`;
+  }
+  for (let i = 0; i < salidas.length; i++) {
+    const fracSum = salidas[i].comps.reduce((a,b)=>a+(b||0),0);
+    const wasFlowUnk = salidas[i].flow === null;
+    tableHtml += `<tr>
+      <td><span style="color:#fb923c;font-weight:700">SAL-${i+1}</span></td>
+      <td><span class="stream-type-badge salida-badge">Salida</span></td>
+      <td class="${wasFlowUnk?'solved-val':'given-val'}">${flujosSalida[i].toFixed(3)} ${wasFlowUnk?'← calc.':''}</td>
+      ${salidas[i].comps.map(v=>`<td class="given-val">${(v||0).toFixed(4)}</td>`).join('')}
+      <td style="color:${Math.abs(fracSum-1)<0.01?'var(--green)':'var(--yellow)'}">Σ=${fracSum.toFixed(3)}</td>
+    </tr>`;
+  }
+  tableHtml += `</tbody></table></div></div>`;
+
+  // G.L. display
+  const glEl = document.getElementById('gl-val');
+  const glHint = document.getElementById('gl-hint');
+  glEl.textContent = '0';
+  glEl.className = 'gl-val gl-ok';
+  glHint.textContent = 'Sistema determinado ✓';
+
+  document.getElementById('results-body').innerHTML = eqHtml + tableHtml;
+  setStatus('ok', `✓ Balances resueltos — Total entrada: ${totalEntrada.toFixed(3)} ${unidad} | Total salida: ${totalSalida.toFixed(3)} ${unidad}`);
+}
+
+// ── Linear system solver ──
+function resolverSistema(A, b) {
+  const n = A.length;
+  if (n === 0) return [];
+  const det = determinante(A);
+  if (Math.abs(det) < 1e-8) return null;
+  return Array.from({length:n}, (_,i) => {
+    const Ai = A.map(row => [...row]);
+    for (let j = 0; j < n; j++) Ai[j][i] = b[j];
+    return determinante(Ai) / det;
+  });
+}
+
+function determinante(m) {
+  const n = m.length;
+  if (n === 1) return m[0][0];
+  if (n === 2) return m[0][0]*m[1][1] - m[0][1]*m[1][0];
+  return m[0].reduce((det, val, i) => {
+    const sub = m.slice(1).map(row => row.filter((_,k)=>k!==i));
+    return det + val * determinante(sub) * (i%2===0?1:-1);
+  }, 0);
+}
+
+// ── UI helpers ──
+function showError(msg) {
+  document.getElementById('results-body').innerHTML = `
+    <div style="background:#f8717110;border:1px solid #f8717140;border-radius:8px;padding:20px;font-family:var(--mono);font-size:12px;color:#f87171;display:flex;gap:12px;align-items:flex-start">
+      <span style="font-size:20px;flex-shrink:0">⚠️</span>
+      <div><div style="font-weight:700;margin-bottom:6px;font-size:11px;letter-spacing:.06em;text-transform:uppercase">Error al resolver</div>${msg}</div>
+    </div>`;
+  setStatus('err', 'Error — ' + msg.substring(0, 80));
+  const glEl = document.getElementById('gl-val');
+  glEl.textContent = '!';
+  glEl.className = 'gl-val gl-bad';
+  document.getElementById('gl-hint').textContent = 'Datos insuficientes o inconsistentes';
+}
+
+function setStatus(type, msg) {
+  const strip = document.getElementById('status-strip');
+  const txt = strip.querySelector('.status-txt');
+  strip.className = 'status-strip strip-' + type;
+  txt.textContent = msg;
+}
+
+function resetForm() {
+  document.getElementById('streams-container').innerHTML = '';
+  document.getElementById('results-body').innerHTML = `<div class="result-placeholder"><div>🔍</div>Configure el problema, ingrese los datos conocidos y presione <strong>Resolver balances</strong>.</div>`;
+  setStatus('idle','Reiniciado — configure y genere el formulario');
+  const glEl = document.getElementById('gl-val');
+  glEl.textContent = '—';
+  glEl.className = 'gl-val gl-idle';
+  document.getElementById('gl-hint').textContent = 'Configure el sistema';
+  document.getElementById('pfd-svg').innerHTML = `<rect width="600" height="80" fill="transparent"/><text x="300" y="44" text-anchor="middle" fill="#1e2d42" font-family="JetBrains Mono, monospace" font-size="11">Configure el sistema y genere el formulario</text>`;
+}
+
+// ── Init ──
+updateLegend();
+updateGL();
+buildForms(); // start with defaults
 </script>
+
 </body>
 </html>
