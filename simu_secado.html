@@ -1,72 +1,377 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <title>PFD - Secador Rotatorio | Simulador de Procesos</title>
-    <style>
-        body { background: #2d3e4b; font-family: 'Segoe UI', monospace; padding: 20px; }
-        .pfd-sec { max-width: 1200px; margin: 0 auto; background: #f5f7fa; border-radius: 16px; overflow: hidden; }
-        .header { background: #1a3a47; color: white; padding: 12px 24px; display: flex; justify-content: space-between; }
-        .diagrama { background: #eef2f5; padding: 35px; background-image: linear-gradient(#c0cfdf 1px, transparent 1px), linear-gradient(90deg, #c0cfdf 1px, transparent 1px); background-size: 20px 20px; display: flex; justify-content: center; gap: 40px; flex-wrap: wrap; align-items: center; }
-        .secador-equipo { background: #9b9e7c; border-radius: 80px; padding: 30px; text-align: center; border: 3px solid #5a5e3a; min-width: 180px; transform: rotate(-2deg); }
-        .corriente-card { background: white; border-radius: 20px; padding: 15px; min-width: 200px; border-left: 6px solid #d98c2b; }
-        .editable-val { font-size: 1.5rem; font-weight: bold; background: #f0f4fa; display: inline-block; padding: 4px 12px; border-radius: 28px; cursor: pointer; }
-        .tabla-res { width: 90%; margin: 20px auto; border-collapse: collapse; background: white; }
-        th { background: #5a6e3a; color: white; }
-        td { border: 1px solid #bbb; padding: 8px; text-align: center; }
-        .footer-msg { background: #1a3a47; color: #ffd966; padding: 10px; text-align: center; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DRY-101 Secador Rotatorio | Simulador de Procesos</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Sora:wght@300;400;600;700&display=swap');
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0a0e14;--surf:#0f1520;--surf2:#141d2b;--surf3:#1a2538;
+  --border:#1e2d42;--border2:#243550;
+  --text:#dce8f5;--muted:#6b859e;
+  --accent:#fb923c;--accent2:#ea580c;
+  --wet:#38bdf8;--dry:#fbbf24;--vapor:#a78bfa;
+  --green:#34d399;--yellow:#fbbf24;--red:#f87171;
+  --mono:'JetBrains Mono',monospace;--sans:'Sora',sans-serif;
+}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14px;line-height:1.6;min-height:100vh}
+.header{background:linear-gradient(90deg,var(--surf) 0%,#1a0e08 100%);border-bottom:1px solid var(--border);padding:14px 24px;display:flex;align-items:center;gap:16px;position:sticky;top:0;z-index:100}
+.header-title{font-family:var(--mono);font-size:13px;font-weight:700;letter-spacing:.02em}
+.header-sub{font-size:11px;color:var(--muted);font-family:var(--mono)}
+.header-right{margin-left:auto;display:flex;gap:10px;align-items:center}
+.btn-back{background:var(--surf3);border:1px solid var(--border2);color:var(--muted);padding:6px 14px;border-radius:6px;text-decoration:none;font-size:11px;font-family:var(--mono);transition:.2s}
+.btn-back:hover{color:var(--text);border-color:var(--accent)}
+.tag{background:#fb923c20;color:var(--accent);border:1px solid #fb923c40;border-radius:4px;padding:2px 8px;font-size:10px;font-family:var(--mono);font-weight:600}
+.main{display:grid;grid-template-columns:1fr 330px;gap:0;min-height:calc(100vh - 53px)}
+.pfd-area{padding:24px}
+.controls-area{background:var(--surf);border-left:1px solid var(--border);padding:20px;display:flex;flex-direction:column;gap:16px;overflow-y:auto}
+.pfd-wrapper{background:var(--surf);border:1px solid var(--border);border-radius:10px;overflow:hidden}
+.pfd-svg{width:100%;height:auto;display:block}
+.pfd-label{font-family:var(--mono);font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-bottom:14px}
+.ctrl-section{background:var(--surf2);border:1px solid var(--border);border-radius:8px;padding:14px}
+.ctrl-title{font-family:var(--mono);font-size:10px;font-weight:700;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-bottom:12px}
+.slider-row{margin-bottom:12px}
+.slider-label{display:flex;justify-content:space-between;align-items:center;margin-bottom:5px}
+.slider-name{font-size:11px;color:var(--muted);font-family:var(--mono)}
+.slider-val{font-family:var(--mono);font-size:13px;font-weight:700;color:var(--accent)}
+.slider-unit{font-size:9px;color:var(--muted);margin-left:2px}
+input[type=range]{width:100%;height:4px;appearance:none;background:var(--border2);border-radius:2px;outline:none;cursor:pointer}
+input[type=range]::-webkit-slider-thumb{appearance:none;width:14px;height:14px;background:var(--accent);border-radius:50%;cursor:pointer;transition:.15s}
+input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.2)}
+.results-panel{background:var(--surf2);border:1px solid var(--border);border-radius:8px;overflow:hidden}
+.results-header{background:var(--surf3);padding:10px 14px;font-family:var(--mono);font-size:10px;font-weight:700;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;border-bottom:1px solid var(--border)}
+table{width:100%;border-collapse:collapse}
+th{background:var(--surf3);padding:7px 10px;text-align:left;font-size:9px;color:var(--muted);font-family:var(--mono);font-weight:700;letter-spacing:.05em;text-transform:uppercase;border-bottom:1px solid var(--border)}
+td{padding:7px 10px;border-bottom:1px solid var(--border);font-family:var(--mono);font-size:11px}
+tr:last-child td{border-bottom:none}
+.status-bar{padding:10px 14px;font-family:var(--mono);font-size:11px;display:flex;align-items:center;gap:8px;border-top:1px solid var(--border)}
+.status-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.ok .status-dot{background:var(--green);box-shadow:0 0 6px var(--green)}
+.warn .status-dot{background:var(--yellow);box-shadow:0 0 6px var(--yellow)}
+.ok .status-txt{color:var(--green)}
+.warn .status-txt{color:var(--yellow)}
+.eq-panel{background:var(--surf2);border:1px solid var(--border);border-radius:8px;padding:14px}
+.eq-title{font-family:var(--mono);font-size:10px;font-weight:700;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-bottom:10px}
+.eq-line{font-family:var(--mono);font-size:11px;color:var(--text);padding:5px 0;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;gap:8px}
+.eq-line:last-child{border-bottom:none}
+.eq-lhs{color:var(--muted);flex-shrink:0}
+.eq-rhs{color:var(--accent);font-weight:600;text-align:right}
+/* Humidity gauge */
+.gauge-row{display:flex;align-items:center;gap:10px;margin-top:8px}
+.gauge-bar{flex:1;height:10px;background:var(--border2);border-radius:5px;overflow:hidden}
+.gauge-fill{height:100%;background:linear-gradient(90deg,var(--dry),var(--accent));border-radius:5px;transition:width .4s ease}
+.gauge-label{font-family:var(--mono);font-size:10px;color:var(--muted);white-space:nowrap}
+</style>
 </head>
 <body>
-<div class="pfd-sec">
-    <div class="header"><h1>🌡️ PFD - SECADOR ROTATORIO DE SÓLIDOS (Pieles)</h1><a href="simuladores.html" class="btn-volver">← Volver</a></div>
-    <div class="diagrama">
-        <div class="corriente-card"><div>📥 ALIMENTACIÓN HÚMEDA</div><div><span class="editable-val" id="A_display">---</span> lb</div><div style="font-size:0.7rem;">(calculado)</div></div>
-        <div class="secador-equipo"><strong>DRY-101</strong><br>SECADOR<br>🔥<br>pérdida: 59.1%</div>
-        <div class="corriente-card"><div>📤 PRODUCTO SECO</div><div><span class="editable-val" id="peso_final_edit">900</span> lb</div><div>Humedad final: <span class="editable-val" id="hum_edit">7</span> %</div></div>
-    </div>
-    <table class="tabla-res">
-        <thead><tr><th>Parámetro</th><th>Valor</th></tr></thead>
-        <tbody>
-            <tr><td>Alimentación inicial (húmeda)</td><td id="res_A">--- lb</td></tr>
-            <tr><td>Agua extraída en el secado</td><td id="res_B">--- lb</td></tr>
-            <tr><td>Piel completamente seca</td><td id="res_piel_seca">--- lb</td></tr>
-            <tr><td>% de agua eliminada</td><td id="res_porc_elim">--- %</td></tr>
-            <tr><td>Relación lb agua / lb piel seca</td><td id="res_relacion">---</td></tr>
-        </tbody>
-    </table>
-    <div class="footer-msg" id="msgSecado">✔️ Editá el peso final o humedad final clickeando los valores.</div>
+
+<div class="header">
+  <div style="font-size:22px">🌡️</div>
+  <div>
+    <div class="header-title">DRY-101 — SECADOR ROTATORIO DE SÓLIDOS</div>
+    <div class="header-sub">Secado de pieles · Balance por sólido seco</div>
+  </div>
+  <div class="header-right">
+    <span class="tag">PFD</span>
+    <span class="tag">Estado estacionario</span>
+    <a href="simuladores.html" class="btn-back">← Simuladores</a>
+  </div>
 </div>
+
+<div class="main">
+  <div class="pfd-area">
+    <div class="pfd-label">Diagrama de Flujo de Proceso</div>
+    <div class="pfd-wrapper">
+      <svg class="pfd-svg" viewBox="0 0 820 430" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <marker id="arr-wet" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L0,6 L8,3 z" fill="#38bdf8"/>
+          </marker>
+          <marker id="arr-dry" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L0,6 L8,3 z" fill="#fbbf24"/>
+          </marker>
+          <marker id="arr-vap" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L0,6 L8,3 z" fill="#a78bfa"/>
+          </marker>
+          <marker id="arr-air" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L0,6 L8,3 z" fill="#fb923c"/>
+          </marker>
+          <linearGradient id="drierGrad" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%" stop-color="#2a1a0a"/>
+            <stop offset="40%" stop-color="#3a2510"/>
+            <stop offset="100%" stop-color="#1a0e05"/>
+          </linearGradient>
+          <linearGradient id="drierHeat" x1="0" y1="1" x2="0" y2="0">
+            <stop offset="0%" stop-color="#fb923c40"/>
+            <stop offset="100%" stop-color="#fb923c00"/>
+          </linearGradient>
+          <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
+            <circle cx="10" cy="10" r=".5" fill="#1e2d42"/>
+          </pattern>
+        </defs>
+
+        <rect width="820" height="430" fill="#0f1520"/>
+        <rect width="820" height="430" fill="url(#grid)" opacity=".7"/>
+        <rect x="8" y="8" width="804" height="414" rx="4" fill="none" stroke="#1e2d42" stroke-width="1" stroke-dasharray="6 4" opacity=".6"/>
+        <text x="20" y="22" fill="#1e2d42" font-family="JetBrains Mono, monospace" font-size="8" letter-spacing="2">FRONTERA DE SISTEMA</text>
+
+        <!-- ═══ SECADOR ROTATORIO ═══ -->
+        <!-- Heat glow below drum -->
+        <ellipse cx="415" cy="290" rx="140" ry="20" fill="url(#drierHeat)" opacity=".5"/>
+        <!-- Drum body (horizontal cylinder) -->
+        <rect x="280" y="170" width="270" height="110" rx="8" fill="url(#drierGrad)" stroke="#6b3010" stroke-width="2"/>
+        <!-- Left cap -->
+        <ellipse cx="280" cy="225" rx="18" ry="55" fill="#2a1a0a" stroke="#6b3010" stroke-width="2"/>
+        <!-- Right cap -->
+        <ellipse cx="550" cy="225" rx="18" ry="55" fill="#2a1a0a" stroke="#6b3010" stroke-width="2"/>
+        <!-- Interior flights (fins) -->
+        <line x1="310" y1="172" x2="310" y2="278" stroke="#3a2510" stroke-width="8" stroke-dasharray="10 6"/>
+        <line x1="350" y1="172" x2="350" y2="278" stroke="#3a2510" stroke-width="8" stroke-dasharray="10 6" stroke-dashoffset="8"/>
+        <line x1="390" y1="172" x2="390" y2="278" stroke="#3a2510" stroke-width="8" stroke-dasharray="10 6"/>
+        <line x1="430" y1="172" x2="430" y2="278" stroke="#3a2510" stroke-width="8" stroke-dasharray="10 6" stroke-dashoffset="8"/>
+        <line x1="470" y1="172" x2="470" y2="278" stroke="#3a2510" stroke-width="8" stroke-dasharray="10 6"/>
+        <line x1="510" y1="172" x2="510" y2="278" stroke="#3a2510" stroke-width="8" stroke-dasharray="10 6" stroke-dashoffset="8"/>
+        <!-- Rotation arrow on drum -->
+        <path d="M390,192 A30,30 0 0,1 440,192" stroke="#fb923c40" stroke-width="2" fill="none" marker-end="url(#arr-air)"/>
+        <!-- Drum label -->
+        <text x="415" y="218" text-anchor="middle" fill="#7a4a20" font-family="JetBrains Mono, monospace" font-size="12" font-weight="700">DRY-101</text>
+        <text x="415" y="234" text-anchor="middle" fill="#5a3010" font-family="JetBrains Mono, monospace" font-size="9">SECADOR ROTATORIO</text>
+        <text x="415" y="248" text-anchor="middle" fill="#5a3010" font-family="JetBrains Mono, monospace" font-size="8">Pérdida fija: 59.1%</text>
+        <!-- Legs / support -->
+        <line x1="320" y1="280" x2="310" y2="320" stroke="#3a2510" stroke-width="4"/>
+        <line x1="510" y1="280" x2="520" y2="320" stroke="#3a2510" stroke-width="4"/>
+        <line x1="300" y1="318" x2="330" y2="318" stroke="#3a2510" stroke-width="3"/>
+        <line x1="510" y1="318" x2="540" y2="318" stroke="#3a2510" stroke-width="3"/>
+        <!-- Burner below -->
+        <rect x="370" y="322" width="90" height="28" rx="4" fill="#1a0e05" stroke="#6b3010" stroke-width="1"/>
+        <text x="415" y="340" text-anchor="middle" fill="#7a4a20" font-family="JetBrains Mono, monospace" font-size="8">🔥 QUEMADOR</text>
+        <!-- Heat lines upward from burner -->
+        <line x1="395" y1="322" x2="370" y2="280" stroke="#fb923c30" stroke-width="1" stroke-dasharray="3 3"/>
+        <line x1="415" y1="322" x2="415" y2="280" stroke="#fb923c40" stroke-width="1.5" stroke-dasharray="3 3"/>
+        <line x1="435" y1="322" x2="460" y2="280" stroke="#fb923c30" stroke-width="1" stroke-dasharray="3 3"/>
+
+        <!-- ═══ CORRIENTE 1 — ALIMENTACIÓN HÚMEDA (azul) ═══ -->
+        <rect x="30" y="155" width="200" height="115" rx="6" fill="#38bdf808" stroke="#38bdf840" stroke-width="1"/>
+        <rect x="30" y="155" width="4" height="115" rx="2" fill="#38bdf8"/>
+        <text x="42" y="172" fill="#38bdf8" font-family="JetBrains Mono, monospace" font-size="9" font-weight="700">COR-1 · ALIMENTACIÓN</text>
+        <line x1="38" y1="176" x2="224" y2="176" stroke="#38bdf820" stroke-width=".5"/>
+        <text x="42" y="191" fill="#6b859e" font-family="JetBrains Mono, monospace" font-size="9">Flujo total</text>
+        <text x="160" y="191" fill="#38bdf8" font-family="JetBrains Mono, monospace" font-size="10" font-weight="700" id="lbl-A">---</text>
+        <text x="198" y="191" fill="#6b859e" font-family="JetBrains Mono, monospace" font-size="8"> lb</text>
+        <text x="42" y="209" fill="#6b859e" font-family="JetBrains Mono, monospace" font-size="9">Piel seca</text>
+        <text x="160" y="209" fill="#dce8f5" font-family="JetBrains Mono, monospace" font-size="10" font-weight="700" id="lbl-ps-in">---</text>
+        <text x="198" y="209" fill="#6b859e" font-family="JetBrains Mono, monospace" font-size="8"> lb</text>
+        <text x="42" y="227" fill="#6b859e" font-family="JetBrains Mono, monospace" font-size="9">Agua inicial</text>
+        <text x="160" y="227" fill="#38bdf8" font-family="JetBrains Mono, monospace" font-size="10" font-weight="700" id="lbl-agua-in">---</text>
+        <text x="198" y="227" fill="#6b859e" font-family="JetBrains Mono, monospace" font-size="8"> lb</text>
+        <text x="42" y="245" fill="#6b859e" font-family="JetBrains Mono, monospace" font-size="9">Hum. base húmeda</text>
+        <text x="160" y="245" fill="#4a6070" font-family="JetBrains Mono, monospace" font-size="10" id="lbl-hum-in">---</text>
+        <text x="42" y="260" fill="#6b859e" font-family="JetBrains Mono, monospace" font-size="9">Estado</text>
+        <text x="160" y="260" fill="#4a6070" font-family="JetBrains Mono, monospace" font-size="9">Húmedo ← calc</text>
+
+        <!-- Pipe 1 → Dryer -->
+        <line x1="230" y1="212" x2="260" y2="212" stroke="#38bdf8" stroke-width="2.5" marker-end="url(#arr-wet)"/>
+        <rect x="242" y="200" width="18" height="14" rx="3" fill="#38bdf8"/>
+        <text x="251" y="211" text-anchor="middle" fill="#0a0e14" font-family="JetBrains Mono, monospace" font-size="9" font-weight="700">1</text>
+
+        <!-- ═══ CORRIENTE 2 — PRODUCTO SECO (amarillo) ═══ -->
+        <rect x="590" y="155" width="200" height="115" rx="6" fill="#fbbf2408" stroke="#fbbf2440" stroke-width="1"/>
+        <rect x="590" y="155" width="4" height="115" rx="2" fill="#fbbf24"/>
+        <text x="602" y="172" fill="#fbbf24" font-family="JetBrains Mono, monospace" font-size="9" font-weight="700">COR-2 · PRODUCTO SECO</text>
+        <line x1="598" y1="176" x2="784" y2="176" stroke="#fbbf2420" stroke-width=".5"/>
+        <text x="602" y="191" fill="#6b859e" font-family="JetBrains Mono, monospace" font-size="9">Flujo total</text>
+        <text x="720" y="191" fill="#fbbf24" font-family="JetBrains Mono, monospace" font-size="10" font-weight="700" id="lbl-B2">---</text>
+        <text x="757" y="191" fill="#6b859e" font-family="JetBrains Mono, monospace" font-size="8"> lb</text>
+        <text x="602" y="209" fill="#6b859e" font-family="JetBrains Mono, monospace" font-size="9">Piel seca</text>
+        <text x="720" y="209" fill="#dce8f5" font-family="JetBrains Mono, monospace" font-size="10" font-weight="700" id="lbl-ps-out">---</text>
+        <text x="757" y="209" fill="#6b859e" font-family="JetBrains Mono, monospace" font-size="8"> lb</text>
+        <text x="602" y="227" fill="#6b859e" font-family="JetBrains Mono, monospace" font-size="9">Agua residual</text>
+        <text x="720" y="227" fill="#dce8f5" font-family="JetBrains Mono, monospace" font-size="10" font-weight="700" id="lbl-agua-fin">---</text>
+        <text x="757" y="227" fill="#6b859e" font-family="JetBrains Mono, monospace" font-size="8"> lb</text>
+        <text x="602" y="245" fill="#6b859e" font-family="JetBrains Mono, monospace" font-size="9">Hum. final</text>
+        <text x="720" y="245" fill="#fbbf24" font-family="JetBrains Mono, monospace" font-size="10" font-weight="700" id="lbl-hum-fin">7.0%</text>
+        <text x="602" y="260" fill="#6b859e" font-family="JetBrains Mono, monospace" font-size="9">Estado</text>
+        <text x="720" y="260" fill="#4a6070" font-family="JetBrains Mono, monospace" font-size="9">Seco → fijo</text>
+
+        <!-- Pipe Dryer → COR-2 -->
+        <line x1="570" y1="212" x2="588" y2="212" stroke="#fbbf24" stroke-width="2.5" marker-end="url(#arr-dry)"/>
+        <rect x="548" y="200" width="18" height="14" rx="3" fill="#fbbf24"/>
+        <text x="557" y="211" text-anchor="middle" fill="#0a0e14" font-family="JetBrains Mono, monospace" font-size="9" font-weight="700">2</text>
+
+        <!-- ═══ CORRIENTE 3 — VAPOR/AGUA EXTRAÍDA (púrpura, sale hacia arriba) ═══ -->
+        <rect x="310" y="30" width="220" height="90" rx="6" fill="#a78bfa08" stroke="#a78bfa40" stroke-width="1"/>
+        <rect x="310" y="30" width="4" height="90" rx="2" fill="#a78bfa"/>
+        <text x="322" y="47" fill="#a78bfa" font-family="JetBrains Mono, monospace" font-size="9" font-weight="700">COR-3 · VAPOR DE AGUA</text>
+        <line x1="318" y1="51" x2="524" y2="51" stroke="#a78bfa20" stroke-width=".5"/>
+        <text x="322" y="66" fill="#6b859e" font-family="JetBrains Mono, monospace" font-size="9">Agua extraída (B)</text>
+        <text x="455" y="66" fill="#a78bfa" font-family="JetBrains Mono, monospace" font-size="10" font-weight="700" id="lbl-B">---</text>
+        <text x="484" y="66" fill="#6b859e" font-family="JetBrains Mono, monospace" font-size="8"> lb</text>
+        <text x="322" y="84" fill="#6b859e" font-family="JetBrains Mono, monospace" font-size="9">% agua eliminada</text>
+        <text x="455" y="84" fill="#34d399" font-family="JetBrains Mono, monospace" font-size="10" font-weight="700" id="lbl-porc">---</text>
+        <text x="322" y="102" fill="#6b859e" font-family="JetBrains Mono, monospace" font-size="9">Lb agua / lb piel seca</text>
+        <text x="455" y="102" fill="#dce8f5" font-family="JetBrains Mono, monospace" font-size="10" font-weight="700" id="lbl-relacion">---</text>
+        <text x="322" y="115" fill="#6b859e" font-family="JetBrains Mono, monospace" font-size="9">Fase</text>
+        <text x="455" y="115" fill="#4a6070" font-family="JetBrains Mono, monospace" font-size="9">Vapor → extrae</text>
+
+        <!-- Pipe Dryer → vapor (upward) -->
+        <line x1="415" y1="168" x2="415" y2="122" stroke="#a78bfa" stroke-width="2" stroke-dasharray="5 3" marker-end="url(#arr-vap)"/>
+        <rect x="404" y="139" width="18" height="14" rx="3" fill="#a78bfa"/>
+        <text x="413" y="150" text-anchor="middle" fill="#0a0e14" font-family="JetBrains Mono, monospace" font-size="9" font-weight="700">3</text>
+
+        <!-- Air inlet (hot air into dryer, bottom arrow) -->
+        <line x1="415" y1="400" x2="415" y2="352" stroke="#fb923c" stroke-width="1.5" stroke-dasharray="4 3" marker-end="url(#arr-air)"/>
+        <text x="430" y="380" fill="#7a4a20" font-family="JetBrains Mono, monospace" font-size="8">Aire caliente</text>
+        <text x="430" y="392" fill="#5a3010" font-family="JetBrains Mono, monospace" font-size="8">(calor proceso)</text>
+
+        <!-- Efficiency gauge (visual) -->
+        <rect x="620" y="330" width="180" height="74" rx="6" fill="#0f152099" stroke="#1e2d42" stroke-width="1"/>
+        <text x="634" y="347" fill="#6b859e" font-family="JetBrains Mono, monospace" font-size="8" font-weight="700" letter-spacing=".1em">EFICIENCIA SECADO</text>
+        <line x1="628" y1="351" x2="794" y2="351" stroke="#1e2d42" stroke-width=".5"/>
+        <!-- gauge bar -->
+        <rect x="634" y="358" width="154" height="10" rx="5" fill="#1e2d42"/>
+        <rect x="634" y="358" width="0" height="10" rx="5" fill="linear-gradient(90deg,#fbbf24,#fb923c)" id="eff-bar"/>
+        <rect x="634" y="358" id="eff-bar-vis" width="100" height="10" rx="5" fill="#fbbf24" style="transition:width .4s"/>
+        <text x="634" y="382" fill="#6b859e" font-family="JetBrains Mono, monospace" font-size="8">% agua eliminada:</text>
+        <text x="740" y="382" fill="#fbbf24" font-family="JetBrains Mono, monospace" font-size="10" font-weight="700" id="eff-pct">---</text>
+        <text x="634" y="397" fill="#6b859e" font-family="JetBrains Mono, monospace" font-size="8">Rel. agua/piel:</text>
+        <text x="740" y="397" fill="#a78bfa" font-family="JetBrains Mono, monospace" font-size="10" id="eff-rel">---</text>
+      </svg>
+    </div>
+  </div>
+
+  <!-- Controls -->
+  <div class="controls-area">
+
+    <div class="ctrl-section">
+      <div class="ctrl-title"><span style="color:#fbbf24">●</span> &nbsp;COR-2 — Producto Seco (parámetros fijados)</div>
+
+      <div class="slider-row">
+        <div class="slider-label">
+          <span class="slider-name">Peso final (B)</span>
+          <span><span class="slider-val" id="sv-pf">900.0</span><span class="slider-unit">lb</span></span>
+        </div>
+        <input type="range" id="sl-pf" min="200" max="2000" step="10" value="900">
+      </div>
+
+      <div class="slider-row">
+        <div class="slider-label">
+          <span class="slider-name">Humedad final (w)</span>
+          <span><span class="slider-val" id="sv-hf">7.0</span><span class="slider-unit">%</span></span>
+        </div>
+        <input type="range" id="sl-hf" min="1" max="30" step="0.5" value="7">
+      </div>
+
+      <!-- Humidity visual -->
+      <div style="margin-top:6px">
+        <div style="font-family:var(--mono);font-size:9px;color:var(--muted);margin-bottom:4px">Humedad en producto</div>
+        <div style="background:var(--border2);border-radius:4px;height:8px;overflow:hidden">
+          <div id="hum-vis" style="height:100%;background:var(--wet);border-radius:4px;width:7%;transition:width .4s"></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-family:var(--mono);font-size:8px;color:var(--muted);margin-top:2px">
+          <span>0%</span><span>Seco</span><span>30%</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="results-panel">
+      <div class="results-header">⊞ Balance de Materia</div>
+      <table>
+        <thead>
+          <tr><th>Parámetro</th><th>Valor</th></tr>
+        </thead>
+        <tbody id="tbody">
+          <tr><td colspan="2" style="text-align:center;color:#6b859e;font-size:10px;padding:14px;font-family:var(--mono)">Calculando...</td></tr>
+        </tbody>
+      </table>
+      <div class="status-bar ok" id="status-bar">
+        <div class="status-dot"></div>
+        <span class="status-txt" id="status-txt">Simulación activa</span>
+      </div>
+    </div>
+
+    <div class="eq-panel">
+      <div class="eq-title">📐 Metodología (base: sólido seco)</div>
+      <div class="eq-line"><span class="eq-lhs">Piel seca</span><span class="eq-rhs">B × (1 − w/100)</span></div>
+      <div class="eq-line"><span class="eq-lhs">Agua final</span><span class="eq-rhs">B × w/100</span></div>
+      <div class="eq-line"><span class="eq-lhs">Alimentación A</span><span class="eq-rhs">ps / (1 − 0.591)</span></div>
+      <div class="eq-line"><span class="eq-lhs">Agua extraída</span><span class="eq-rhs">A × 0.591</span></div>
+      <div class="eq-line"><span class="eq-lhs">Verificación</span><span class="eq-rhs">A = B + agua_extraída</span></div>
+      <div class="eq-line"><span class="eq-lhs">Balance</span><span class="eq-rhs" id="eq-bal">---</span></div>
+    </div>
+
+  </div>
+</div>
+
 <script>
-    function actualizarSecador() {
-        let pesoFinal = parseFloat(document.getElementById('peso_final_edit').innerText);
-        let humedadFinal = parseFloat(document.getElementById('hum_edit').innerText);
-        if(isNaN(pesoFinal)) pesoFinal = 900;
-        if(isNaN(humedadFinal)) humedadFinal = 7;
-        let aguaFinal = pesoFinal * humedadFinal / 100;
-        let pielSeca = pesoFinal - aguaFinal;
-        let perdidaPeso = 59.1; // % fijo del problema
-        let A = (pielSeca + aguaFinal) / (1 - (perdidaPeso/100));
-        let B = (perdidaPeso/100) * A;
-        let aguaInicial = A - pielSeca;
-        let porcElim = (B / aguaInicial) * 100;
-        let relacion = B / pielSeca;
-        document.getElementById('A_display').innerHTML = A.toFixed(1);
-        document.getElementById('res_A').innerHTML = A.toFixed(1) + " lb";
-        document.getElementById('res_B').innerHTML = B.toFixed(1) + " lb";
-        document.getElementById('res_piel_seca').innerHTML = pielSeca.toFixed(1) + " lb";
-        document.getElementById('res_porc_elim').innerHTML = porcElim.toFixed(1) + " %";
-        document.getElementById('res_relacion').innerHTML = relacion.toFixed(3);
-        document.getElementById('msgSecado').innerHTML = "✅ Simulación actualizada. Balance de sólido seco verificado.";
-    }
-    function makeEditableSpan(id) {
-        let el = document.getElementById(id);
-        el.setAttribute('contenteditable','true');
-        el.addEventListener('blur', actualizarSecador);
-    }
-    makeEditableSpan('peso_final_edit');
-    makeEditableSpan('hum_edit');
-    actualizarSecador();
+let pesoFinal=900, humedadFinal=7;
+
+function fmt(v,d=1){return isNaN(v)||!isFinite(v)?'---':v.toFixed(d)}
+function $(id,v){const e=document.getElementById(id);if(e)e.textContent=v}
+function css(id,p,v){const e=document.getElementById(id);if(e)e.style[p]=v}
+
+function solve(){
+  const aguaFin = pesoFinal * humedadFinal/100;
+  const pielSeca = pesoFinal - aguaFin;
+  const perdida = 0.591; // fijo del problema
+  const A = pielSeca / (1 - perdida);
+  const B = A * perdida; // agua extraída
+  const aguaInic = A - pielSeca;
+  const porcElim = aguaInic > 0 ? (B/aguaInic)*100 : 0;
+  const relacion = pielSeca > 0 ? B/pielSeca : 0;
+  const check = Math.abs(A - (pesoFinal + B)) < 0.1;
+
+  // SVG labels
+  $('lbl-A', fmt(A,1));
+  $('lbl-ps-in', fmt(pielSeca,1));
+  $('lbl-agua-in', fmt(aguaInic,1));
+  $('lbl-hum-in', fmt((aguaInic/A)*100,1)+'%');
+  $('lbl-B2', fmt(pesoFinal,1));
+  $('lbl-ps-out', fmt(pielSeca,1));
+  $('lbl-agua-fin', fmt(aguaFin,1));
+  $('lbl-hum-fin', fmt(humedadFinal,1)+'%');
+  $('lbl-B', fmt(B,1));
+  $('lbl-porc', fmt(porcElim,1)+'%');
+  $('lbl-relacion', fmt(relacion,3));
+  $('eff-pct', fmt(porcElim,1)+'%');
+  $('eff-rel', fmt(relacion,3));
+  css('eff-bar-vis','width',(Math.min(porcElim,100)*1.54)+'px');
+
+  // Table
+  const tbody=document.getElementById('tbody');
+  tbody.innerHTML=`
+    <tr><td style="color:#6b859e">Alimentación A</td><td style="color:#38bdf8;font-weight:700">${fmt(A,1)} lb</td></tr>
+    <tr><td style="color:#6b859e">Piel seca</td><td style="color:#dce8f5;font-weight:700">${fmt(pielSeca,1)} lb</td></tr>
+    <tr><td style="color:#6b859e">Agua inicial</td><td style="color:#38bdf8">${fmt(aguaInic,1)} lb</td></tr>
+    <tr><td style="color:#6b859e">Agua extraída (B)</td><td style="color:#a78bfa;font-weight:700">${fmt(B,1)} lb</td></tr>
+    <tr><td style="color:#6b859e">Producto seco</td><td style="color:#fbbf24;font-weight:700">${fmt(pesoFinal,1)} lb</td></tr>
+    <tr><td style="color:#6b859e">Agua residual</td><td style="color:#fbbf24">${fmt(aguaFin,1)} lb</td></tr>
+    <tr><td style="color:#6b859e">% agua eliminada</td><td style="color:#34d399;font-weight:700">${fmt(porcElim,1)}%</td></tr>
+    <tr><td style="color:#6b859e">Rel. lb/lb</td><td style="color:#a78bfa">${fmt(relacion,3)}</td></tr>
+  `;
+
+  $('eq-bal', check ? fmt(A,1)+' = '+fmt(pesoFinal,1)+' + '+fmt(B,1)+' ✓' : 'ERROR');
+  css('hum-vis','width', Math.min(humedadFinal/30*100,100)+'%');
+
+  const sb=document.getElementById('status-bar');
+  const st=document.getElementById('status-txt');
+  sb.className='status-bar ok';
+  st.textContent='✓ Balance verificado · A = '+fmt(A,1)+' lb alimentación';
+}
+
+document.getElementById('sl-pf').addEventListener('input',e=>{
+  pesoFinal=parseFloat(e.target.value);
+  $('sv-pf',pesoFinal.toFixed(1));
+  solve();
+});
+document.getElementById('sl-hf').addEventListener('input',e=>{
+  humedadFinal=parseFloat(e.target.value);
+  $('sv-hf',humedadFinal.toFixed(1));
+  solve();
+});
+
+solve();
 </script>
 </body>
 </html>

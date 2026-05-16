@@ -1,150 +1,400 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simuladores de Balances de Materia | Laboratorio Industrias</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #e0eafc 0%, #cfdef3 100%);
-            padding: 2rem 1rem;
-            min-height: 100vh;
-        }
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-        .header {
-            background: linear-gradient(135deg, #1e4668 0%, #2c7da0 100%);
-            color: white;
-            padding: 2rem;
-            border-radius: 28px;
-            text-align: center;
-            margin-bottom: 2rem;
-        }
-        .header h1 { font-size: 2rem; margin-bottom: 0.5rem; }
-        .header p { opacity: 0.9; }
-        .volver {
-            display: inline-block;
-            background: #4a5b6e;
-            color: white;
-            text-decoration: none;
-            padding: 8px 20px;
-            border-radius: 30px;
-            margin-bottom: 1.5rem;
-            font-weight: bold;
-        }
-        .volver:hover { background: #2c3e50; }
-        .grid-simuladores {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-            gap: 1.8rem;
-        }
-        .card-sim {
-            background: white;
-            border-radius: 28px;
-            overflow: hidden;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-            transition: transform 0.2s;
-        }
-        .card-sim:hover { transform: translateY(-5px); }
-        .card-header {
-            background: #2c7da0;
-            color: white;
-            padding: 1.2rem;
-            text-align: center;
-            font-size: 1.5rem;
-        }
-        .card-body { padding: 1.5rem; }
-        .card-body p { color: #4a5b6e; margin-bottom: 1rem; }
-        .badge {
-            background: #eef2fa;
-            color: #1e4668;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 0.75rem;
-            display: inline-block;
-            margin-bottom: 1rem;
-        }
-        .btn-sim {
-            display: inline-block;
-            background: #2e7d32;
-            color: white;
-            padding: 10px 24px;
-            border-radius: 40px;
-            text-decoration: none;
-            font-weight: bold;
-            margin-top: 1rem;
-        }
-        .btn-sim:hover { background: #1b5e20; }
-        .btn-calc {
-            background: #d98c2b;
-        }
-        .btn-calc:hover { background: #b56a1a; }
-        footer {
-            text-align: center;
-            margin-top: 3rem;
-            color: #5f6c7a;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Laboratorio Virtual — Balances de Materia | 7° TQ EEST N°1</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Sora:wght@300;400;500;600;700;800&display=swap');
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#070b12;--surf:#0d1420;--surf2:#111a28;--surf3:#162035;
+  --border:#1a2840;--border2:#1e3050;
+  --text:#d8e8f5;--muted:#5e7a90;--muted2:#4a6070;
+  --accent:#38bdf8;
+  --dest:#38bdf8;  /* destilación - azul */
+  --mix:#34d399;   /* mezclador - verde */
+  --sec:#fb923c;   /* secado - naranja */
+  --calc:#a78bfa;  /* calculadora - púrpura */
+  --mono:'JetBrains Mono',monospace;--sans:'Sora',sans-serif;
+}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:100vh;overflow-x:hidden}
+
+/* ── Noise overlay ── */
+body::before{
+  content:'';position:fixed;inset:0;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events:none;z-index:0;opacity:.4
+}
+
+/* ── Header ── */
+.header{
+  position:relative;z-index:10;
+  background:linear-gradient(180deg,#0d1420 0%,transparent 100%);
+  padding:20px 32px 0;
+  display:flex;align-items:flex-start;justify-content:space-between;
+}
+.header-brand{
+  display:flex;align-items:center;gap:14px;
+}
+.header-logo{
+  width:44px;height:44px;background:linear-gradient(135deg,#38bdf820,#38bdf840);
+  border:1px solid #38bdf830;border-radius:10px;display:flex;align-items:center;
+  justify-content:center;font-size:22px;
+}
+.header-text-top{font-family:var(--mono);font-size:10px;font-weight:700;color:var(--muted);letter-spacing:.15em;text-transform:uppercase}
+.header-text-main{font-family:var(--mono);font-size:13px;font-weight:700;color:var(--text);letter-spacing:.02em}
+.btn-teoria{
+  background:var(--surf2);border:1px solid var(--border2);
+  color:var(--muted);padding:8px 16px;border-radius:6px;
+  text-decoration:none;font-size:11px;font-family:var(--mono);
+  transition:.2s;display:flex;align-items:center;gap:6px;margin-top:4px
+}
+.btn-teoria:hover{color:var(--text);border-color:var(--accent)}
+
+/* ── Hero ── */
+.hero{
+  position:relative;z-index:5;
+  text-align:center;padding:52px 24px 40px;
+  max-width:760px;margin:0 auto;
+}
+.hero-tag{
+  display:inline-block;background:#38bdf812;border:1px solid #38bdf830;
+  color:var(--accent);padding:4px 14px;border-radius:20px;
+  font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
+  margin-bottom:20px;
+}
+.hero h1{
+  font-size:clamp(28px,5vw,48px);font-weight:800;line-height:1.1;
+  background:linear-gradient(135deg,#dce8f5 0%,#38bdf8 50%,#60a5fa 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  margin-bottom:14px;letter-spacing:-.02em;
+}
+.hero p{font-size:16px;color:var(--muted);line-height:1.7;font-weight:300;max-width:560px;margin:0 auto 32px}
+.hero-meta{
+  display:flex;gap:24px;justify-content:center;flex-wrap:wrap;
+  font-family:var(--mono);font-size:10px;color:var(--muted2);
+}
+.hero-meta span{display:flex;align-items:center;gap:5px}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--accent);display:inline-block;flex-shrink:0}
+
+/* ── Cards grid ── */
+.grid{
+  position:relative;z-index:5;
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
+  gap:1px;padding:0;
+  border-top:1px solid var(--border);border-bottom:1px solid var(--border);
+  background:var(--border);
+  max-width:1200px;margin:0 auto;
+}
+.card{
+  background:var(--surf);padding:32px;
+  transition:background .2s;cursor:pointer;
+  text-decoration:none;color:inherit;display:flex;flex-direction:column;
+  position:relative;overflow:hidden;
+}
+.card::before{
+  content:'';position:absolute;inset:0;opacity:0;transition:.3s;
+  background:radial-gradient(circle at 30% 40%,var(--card-color,#38bdf8)08,transparent 60%)
+}
+.card:hover{background:var(--surf2)}
+.card:hover::before{opacity:1}
+.card-label{
+  font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;
+  color:var(--card-color,var(--accent));margin-bottom:12px;display:flex;align-items:center;gap:6px;
+}
+.card-label::before{content:'';display:block;width:20px;height:2px;background:var(--card-color,var(--accent));border-radius:1px}
+.card-icon{font-size:32px;margin-bottom:16px;display:block}
+.card h2{font-size:20px;font-weight:700;margin-bottom:8px;line-height:1.2}
+.card p{font-size:13px;color:var(--muted);line-height:1.7;flex:1;margin-bottom:20px}
+.card-tags{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:20px}
+.ctag{
+  background:var(--surf3);border:1px solid var(--border2);
+  color:var(--muted);padding:3px 9px;border-radius:4px;
+  font-family:var(--mono);font-size:9px;
+}
+.card-cta{
+  display:flex;align-items:center;gap:8px;
+  font-family:var(--mono);font-size:11px;font-weight:700;
+  color:var(--card-color,var(--accent));
+  margin-top:auto;
+}
+.card-cta::after{content:'→';transition:.2s}
+.card:hover .card-cta::after{transform:translateX(4px)}
+
+/* ── Card colors ── */
+.card-dest{--card-color:var(--dest)}
+.card-mix{--card-color:var(--mix)}
+.card-sec{--card-color:var(--sec)}
+.card-calc{--card-color:var(--calc)}
+
+/* ── Mini diagram in card ── */
+.mini-pfd{
+  background:var(--bg);border:1px solid var(--border);border-radius:8px;
+  padding:14px;margin-bottom:20px;
+  display:flex;align-items:center;justify-content:center;
+  min-height:70px;position:relative;overflow:hidden;
+}
+.mini-pfd svg{max-width:100%;height:60px}
+
+/* ── Bottom section ── */
+.bottom{
+  position:relative;z-index:5;
+  display:grid;grid-template-columns:1fr 1fr;gap:1px;
+  background:var(--border);
+  max-width:1200px;margin:0 auto;
+  border-bottom:1px solid var(--border);
+}
+.bottom-cell{background:var(--surf);padding:28px 32px}
+.bottom-title{font-family:var(--mono);font-size:10px;font-weight:700;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.bottom-title::before{content:'';display:block;width:3px;height:14px;background:var(--accent);border-radius:2px;flex-shrink:0}
+.step-list{display:flex;flex-direction:column;gap:8px}
+.step-item{display:flex;align-items:flex-start;gap:10px;font-size:12px;color:var(--muted);line-height:1.5}
+.step-num{font-family:var(--mono);font-size:10px;font-weight:700;color:var(--accent);background:#38bdf812;border:1px solid #38bdf830;width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.ref-line{font-size:11px;color:var(--muted);font-family:var(--mono);padding:5px 0;border-bottom:1px solid var(--border);display:flex;gap:10px;align-items:flex-start}
+.ref-line:last-child{border-bottom:none}
+.ref-line::before{content:'▸';color:var(--accent);flex-shrink:0}
+
+/* ── Footer ── */
+footer{
+  position:relative;z-index:5;
+  background:var(--surf);border-top:1px solid var(--border);
+  padding:20px 32px;display:flex;justify-content:space-between;align-items:center;
+  flex-wrap:wrap;gap:12px;
+}
+.footer-left{font-family:var(--mono);font-size:10px;color:var(--muted)}
+.footer-right{font-family:var(--mono);font-size:10px;color:var(--muted2)}
+
+@media(max-width:640px){
+  .grid{grid-template-columns:1fr}
+  .bottom{grid-template-columns:1fr}
+  .header{flex-direction:column;gap:12px}
+  .hero h1{font-size:28px}
+}
+</style>
 </head>
 <body>
-<div class="container">
-    <a href="index.html" class="volver">← Volver a la Guía teórica</a>
-    <div class="header">
-        <h1>🎮 Laboratorio de Simulación</h1>
-        <p>Balances de Materia en Procesos No Reactivos | Interactúa y aprende</p>
-        <p style="font-size:0.9rem; margin-top:10px;">Prof. Ing. Luciano Lamaita - 7° TQ EEST N°1 Saladillo</p>
+
+<div class="header">
+  <div class="header-brand">
+    <div class="header-logo">⚖️</div>
+    <div>
+      <div class="header-text-top">EEST N°1 · Saladillo · 7° TQ</div>
+      <div class="header-text-main">Laboratorio de Industrias — Balances de Materia</div>
     </div>
-
-    <div class="grid-simuladores">
-        <!-- TARJETA 1: CALCULADORA UNIVERSAL -->
-        <div class="card-sim">
-            <div class="card-header">🧮 CALCULADORA UNIVERSAL</div>
-            <div class="card-body">
-                <div class="badge">⚖️ Balances paso a paso</div>
-                <p>Resuelve <strong>cualquier ejercicio de balance de materia</strong> (no reactivo). Definí hasta 5 corrientes de entrada y salida, con hasta 4 componentes. La calculadora muestra las ecuaciones planteadas y los resultados detallados.</p>
-                <p><strong>Ideal para:</strong> Verificar ejercicios hechos a mano, explorar diferentes escenarios, aprender la metodología.</p>
-                <a href="calculadora_balances.html" class="btn-sim btn-calc">🔢 Probar Calculadora →</a>
-            </div>
-        </div>
-
-        <!-- TARJETA 2: Destilación -->
-        <div class="card-sim">
-            <div class="card-header">⚗️ Columna de Destilación</div>
-            <div class="card-body">
-                <div class="badge">Basado en Ejemplo 3.2</div>
-                <p>Columna con 3 componentes (A, B, C). Podés cambiar caudales de alimentación F, tope T, corriente lateral M y composiciones con sliders. El sistema resuelve automáticamente las incógnitas E, D y la composición de M.</p>
-                <a href="simu_destilacion.html" class="btn-sim">🔧 Probar Simulador →</a>
-            </div>
-        </div>
-
-        <!-- TARJETA 3: Mezclador -->
-        <div class="card-sim">
-            <div class="card-header">🧪 Mezclador de Gases</div>
-            <div class="card-body">
-                <div class="badge">Basado en Ejemplo 3.1</div>
-                <p>Mezcla de N₂ e H₂. Usá sliders para ajustar el flujo de N₂ (kg/h) y el flujo total de salida (kgmol/h). El simulador calcula el H₂ necesario y la composición molar final.</p>
-                <a href="simu_mezclador.html" class="btn-sim">🔧 Probar Simulador →</a>
-            </div>
-        </div>
-
-        <!-- TARJETA 4: Secado -->
-        <div class="card-sim">
-            <div class="card-header">🌿 Secado de Pieles</div>
-            <div class="card-body">
-                <div class="badge">Basado en Ejemplo 3.3</div>
-                <p>Proceso de secado con sliders para modificar peso final y humedad. Calcula alimentación inicial, agua extraída, % de eficiencia y relación agua/piel seca.</p>
-                <a href="simu_secado.html" class="btn-sim">🔧 Probar Simulador →</a>
-            </div>
-        </div>
-    </div>
-
-    <footer>
-        Laboratorio de Industrias - EEST N°1 Saladillo | Material interactivo para acompañar la guía teórica
-    </footer>
+  </div>
+  <a href="index.html" class="btn-teoria">📖 Guía teórica</a>
 </div>
+
+<div class="hero">
+  <div class="hero-tag">Laboratorio Virtual Interactivo</div>
+  <h1>Simuladores de Procesos Químicos</h1>
+  <p>Modificá variables, observá cómo se reajustan los balances en tiempo real. Basado en Felder & Rousseau y Himmelblau.</p>
+  <div class="hero-meta">
+    <span><div class="dot"></div>Balances no reactivos</span>
+    <span><div class="dot" style="background:#34d399"></div>Estado estacionario</span>
+    <span><div class="dot" style="background:#fb923c"></div>G.L. = 0 en todos los sistemas</span>
+    <span><div class="dot" style="background:#a78bfa"></div>Sin instalación requerida</span>
+  </div>
+</div>
+
+<!-- Cards -->
+<div class="grid">
+
+  <!-- Destilación -->
+  <a href="simu_destilacion.html" class="card card-dest">
+    <div class="card-label">Simulador 01</div>
+    <div class="mini-pfd">
+      <svg viewBox="0 0 260 60" xmlns="http://www.w3.org/2000/svg">
+        <!-- Feed stream -->
+        <rect x="0" y="20" width="70" height="20" rx="3" fill="#38bdf810" stroke="#38bdf830" stroke-width="1"/>
+        <text x="35" y="33" text-anchor="middle" fill="#38bdf8" font-family="JetBrains Mono, monospace" font-size="7" font-weight="700">F — Alim.</text>
+        <!-- Arrow -->
+        <line x1="70" y1="30" x2="88" y2="30" stroke="#38bdf8" stroke-width="1.5" marker-end="url(#a1)"/>
+        <!-- Tower -->
+        <rect x="90" y="5" width="30" height="50" rx="4" fill="#1a3a5e" stroke="#2a5a80" stroke-width="1.5"/>
+        <line x1="94" y1="20" x2="116" y2="20" stroke="#2a6080" stroke-width="1.5" stroke-dasharray="3 2"/>
+        <line x1="94" y1="30" x2="116" y2="30" stroke="#2a6080" stroke-width="1.5" stroke-dasharray="3 2"/>
+        <line x1="94" y1="40" x2="116" y2="40" stroke="#2a6080" stroke-width="1.5" stroke-dasharray="3 2"/>
+        <text x="105" y="16" text-anchor="middle" fill="#4a80a0" font-family="JetBrains Mono, monospace" font-size="6">T-101</text>
+        <!-- Top stream -->
+        <line x1="120" y1="12" x2="150" y2="12" stroke="#34d399" stroke-width="1.5" marker-end="url(#a2)"/>
+        <rect x="151" y="4" width="60" height="18" rx="3" fill="#34d39910" stroke="#34d39930" stroke-width="1"/>
+        <text x="181" y="15" text-anchor="middle" fill="#34d399" font-family="JetBrains Mono, monospace" font-size="7">T — Tope</text>
+        <!-- Side stream -->
+        <line x1="120" y1="30" x2="150" y2="30" stroke="#fbbf24" stroke-width="1.5" marker-end="url(#a3)"/>
+        <rect x="151" y="22" width="60" height="18" rx="3" fill="#fbbf2410" stroke="#fbbf2430" stroke-width="1"/>
+        <text x="181" y="33" text-anchor="middle" fill="#fbbf24" font-family="JetBrains Mono, monospace" font-size="7">M — Lateral</text>
+        <!-- Bottom stream -->
+        <line x1="120" y1="48" x2="150" y2="48" stroke="#f87171" stroke-width="1.5" marker-end="url(#a4)"/>
+        <rect x="151" y="40" width="60" height="18" rx="3" fill="#f8717110" stroke="#f8717130" stroke-width="1"/>
+        <text x="181" y="51" text-anchor="middle" fill="#f87171" font-family="JetBrains Mono, monospace" font-size="7">D — Fondo</text>
+        <!-- Recycle arrow -->
+        <path d="M 90 12 C 60 0, 20 0, 20 20" stroke="#a78bfa" stroke-width="1" fill="none" stroke-dasharray="3 2" marker-end="url(#a5)"/>
+        <defs>
+          <marker id="a1" markerWidth="5" markerHeight="5" refX="4" refY="2" orient="auto"><path d="M0,0 L0,4 L5,2 z" fill="#38bdf8"/></marker>
+          <marker id="a2" markerWidth="5" markerHeight="5" refX="4" refY="2" orient="auto"><path d="M0,0 L0,4 L5,2 z" fill="#34d399"/></marker>
+          <marker id="a3" markerWidth="5" markerHeight="5" refX="4" refY="2" orient="auto"><path d="M0,0 L0,4 L5,2 z" fill="#fbbf24"/></marker>
+          <marker id="a4" markerWidth="5" markerHeight="5" refX="4" refY="2" orient="auto"><path d="M0,0 L0,4 L5,2 z" fill="#f87171"/></marker>
+          <marker id="a5" markerWidth="5" markerHeight="5" refX="4" refY="2" orient="auto"><path d="M0,0 L0,4 L5,2 z" fill="#a78bfa"/></marker>
+        </defs>
+      </svg>
+    </div>
+    <div class="card-icon">⚗️</div>
+    <h2>Columna de Destilación</h2>
+    <p>Separación multifase con 3 corrientes de salida. Ajustá caudales de alimentación F, tope T y lateral M con sus composiciones. El sistema resuelve E, D y x<sub>M,A</sub> mediante álgebra matricial.</p>
+    <div class="card-tags">
+      <span class="ctag">3 componentes</span>
+      <span class="ctag">5 corrientes</span>
+      <span class="ctag">Álgebra matricial</span>
+      <span class="ctag">Ejemplo 3.2</span>
+    </div>
+    <div class="card-cta">Abrir simulador</div>
+  </a>
+
+  <!-- Mezclador -->
+  <a href="simu_mezclador.html" class="card card-mix">
+    <div class="card-label">Simulador 02</div>
+    <div class="mini-pfd">
+      <svg viewBox="0 0 260 60" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <marker id="b1" markerWidth="5" markerHeight="5" refX="4" refY="2" orient="auto"><path d="M0,0 L0,4 L5,2 z" fill="#38bdf8"/></marker>
+          <marker id="b2" markerWidth="5" markerHeight="5" refX="4" refY="2" orient="auto"><path d="M0,0 L0,4 L5,2 z" fill="#fb923c"/></marker>
+          <marker id="b3" markerWidth="5" markerHeight="5" refX="4" refY="2" orient="auto"><path d="M0,0 L0,4 L5,2 z" fill="#a78bfa"/></marker>
+        </defs>
+        <!-- N2 stream -->
+        <rect x="0" y="2" width="70" height="18" rx="3" fill="#38bdf810" stroke="#38bdf830" stroke-width="1"/>
+        <text x="35" y="14" text-anchor="middle" fill="#38bdf8" font-family="JetBrains Mono, monospace" font-size="7" font-weight="700">A — N₂ puro</text>
+        <line x1="70" y1="11" x2="88" y2="28" stroke="#38bdf8" stroke-width="1.5" marker-end="url(#b1)"/>
+        <!-- H2 stream -->
+        <rect x="0" y="40" width="70" height="18" rx="3" fill="#fb923c10" stroke="#fb923c30" stroke-width="1"/>
+        <text x="35" y="52" text-anchor="middle" fill="#fb923c" font-family="JetBrains Mono, monospace" font-size="7" font-weight="700">B — H₂ calc.</text>
+        <line x1="70" y1="49" x2="88" y2="32" stroke="#fb923c" stroke-width="1.5" marker-end="url(#b2)"/>
+        <!-- Mixer circle -->
+        <circle cx="110" cy="30" r="22" fill="#1a2a1a" stroke="#34d39950" stroke-width="1.5"/>
+        <text x="110" y="27" text-anchor="middle" fill="#4a7050" font-family="JetBrains Mono, monospace" font-size="6">MIX</text>
+        <text x="110" y="36" text-anchor="middle" fill="#4a7050" font-family="JetBrains Mono, monospace" font-size="6">101</text>
+        <!-- Mix out -->
+        <line x1="132" y1="30" x2="160" y2="30" stroke="#a78bfa" stroke-width="1.5" marker-end="url(#b3)"/>
+        <rect x="162" y="10" width="90" height="40" rx="3" fill="#a78bfa10" stroke="#a78bfa30" stroke-width="1"/>
+        <text x="207" y="27" text-anchor="middle" fill="#a78bfa" font-family="JetBrains Mono, monospace" font-size="7" font-weight="700">C — Mezcla</text>
+        <text x="207" y="40" text-anchor="middle" fill="#6b859e" font-family="JetBrains Mono, monospace" font-size="6">N₂ + H₂</text>
+      </svg>
+    </div>
+    <div class="card-icon">🧪</div>
+    <h2>Mezclador de Gases</h2>
+    <p>Mezcla binaria de N₂ puro con H₂. Ajustá el flujo másico de N₂ y el caudal molar total de salida. El simulador calcula el H₂ necesario y la composición molar de la mezcla resultante.</p>
+    <div class="card-tags">
+      <span class="ctag">Balance molar</span>
+      <span class="ctag">2 componentes</span>
+      <span class="ctag">Barra composición</span>
+      <span class="ctag">Ejemplo 3.1</span>
+    </div>
+    <div class="card-cta">Abrir simulador</div>
+  </a>
+
+  <!-- Secado -->
+  <a href="simu_secado.html" class="card card-sec">
+    <div class="card-label">Simulador 03</div>
+    <div class="mini-pfd">
+      <svg viewBox="0 0 260 60" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <marker id="c1" markerWidth="5" markerHeight="5" refX="4" refY="2" orient="auto"><path d="M0,0 L0,4 L5,2 z" fill="#38bdf8"/></marker>
+          <marker id="c2" markerWidth="5" markerHeight="5" refX="4" refY="2" orient="auto"><path d="M0,0 L0,4 L5,2 z" fill="#fbbf24"/></marker>
+          <marker id="c3" markerWidth="5" markerHeight="5" refX="4" refY="2" orient="auto"><path d="M0,0 L0,4 L5,2 z" fill="#a78bfa"/></marker>
+        </defs>
+        <!-- Wet feed -->
+        <rect x="0" y="18" width="72" height="24" rx="3" fill="#38bdf810" stroke="#38bdf830" stroke-width="1"/>
+        <text x="36" y="30" text-anchor="middle" fill="#38bdf8" font-family="JetBrains Mono, monospace" font-size="7" font-weight="700">A — Húmedo</text>
+        <text x="36" y="39" text-anchor="middle" fill="#6b859e" font-family="JetBrains Mono, monospace" font-size="6">(calculado)</text>
+        <line x1="72" y1="30" x2="88" y2="30" stroke="#38bdf8" stroke-width="1.5" marker-end="url(#c1)"/>
+        <!-- Dryer -->
+        <rect x="90" y="12" width="70" height="36" rx="20" fill="#2a1a0a" stroke="#6b3010" stroke-width="1.5"/>
+        <text x="125" y="28" text-anchor="middle" fill="#7a4a20" font-family="JetBrains Mono, monospace" font-size="7">DRY-101</text>
+        <text x="125" y="38" text-anchor="middle" fill="#5a3010" font-family="JetBrains Mono, monospace" font-size="6">🔥 ROT.</text>
+        <!-- Heat upward -->
+        <line x1="125" y1="12" x2="125" y2="2" stroke="#fb923c50" stroke-width="1" stroke-dasharray="2 2" marker-end="url(#c3)"/>
+        <text x="150" y="5" fill="#6b3010" font-family="JetBrains Mono, monospace" font-size="5">vapor</text>
+        <!-- Dry product -->
+        <line x1="160" y1="30" x2="178" y2="30" stroke="#fbbf24" stroke-width="1.5" marker-end="url(#c2)"/>
+        <rect x="180" y="14" width="75" height="32" rx="3" fill="#fbbf2410" stroke="#fbbf2430" stroke-width="1"/>
+        <text x="217" y="27" text-anchor="middle" fill="#fbbf24" font-family="JetBrains Mono, monospace" font-size="7" font-weight="700">B — Seco</text>
+        <text x="217" y="38" text-anchor="middle" fill="#6b859e" font-family="JetBrains Mono, monospace" font-size="6">w% fijo</text>
+      </svg>
+    </div>
+    <div class="card-icon">🌡️</div>
+    <h2>Secador Rotatorio</h2>
+    <p>Proceso de secado de pieles con pérdida fija del 59.1%. Ajustá el peso del producto final y su humedad residual. Calcula la alimentación húmeda, agua extraída, eficiencia y relación agua/piel seca.</p>
+    <div class="card-tags">
+      <span class="ctag">Base sólido seco</span>
+      <span class="ctag">Eficiencia %</span>
+      <span class="ctag">Pérdida fija</span>
+      <span class="ctag">Ejemplo 3.3</span>
+    </div>
+    <div class="card-cta">Abrir simulador</div>
+  </a>
+
+  <!-- Calculadora -->
+  <a href="calculadora_balances.html" class="card card-calc">
+    <div class="card-label">Herramienta Universal</div>
+    <div class="mini-pfd">
+      <svg viewBox="0 0 260 60" xmlns="http://www.w3.org/2000/svg">
+        <rect x="80" y="5" width="100" height="50" rx="6" fill="#1a1030" stroke="#a78bfa40" stroke-width="1.5"/>
+        <text x="130" y="22" text-anchor="middle" fill="#a78bfa" font-family="JetBrains Mono, monospace" font-size="8" font-weight="700">CALCULADORA</text>
+        <text x="130" y="34" text-anchor="middle" fill="#6b859e" font-family="JetBrains Mono, monospace" font-size="7">Hasta 5 corrientes</text>
+        <text x="130" y="46" text-anchor="middle" fill="#6b859e" font-family="JetBrains Mono, monospace" font-size="7">y 4 componentes</text>
+        <!-- Input arrows -->
+        <line x1="10" y1="15" x2="78" y2="25" stroke="#a78bfa50" stroke-width="1"/>
+        <line x1="10" y1="30" x2="78" y2="30" stroke="#a78bfa50" stroke-width="1"/>
+        <line x1="10" y1="45" x2="78" y2="35" stroke="#a78bfa50" stroke-width="1"/>
+        <!-- Output arrow -->
+        <line x1="180" y1="30" x2="250" y2="30" stroke="#a78bfa" stroke-width="1.5"/>
+        <circle cx="250" cy="30" r="5" fill="#a78bfa20" stroke="#a78bfa" stroke-width="1"/>
+        <text x="250" y="33" text-anchor="middle" fill="#a78bfa" font-family="JetBrains Mono, monospace" font-size="7">✓</text>
+      </svg>
+    </div>
+    <div class="card-icon">🧮</div>
+    <h2>Calculadora Universal</h2>
+    <p>Resolvé cualquier balance de materia (proceso no reactivo, estado estacionario). Definí hasta 5 corrientes con hasta 4 componentes. Muestra las ecuaciones planteadas y los resultados paso a paso.</p>
+    <div class="card-tags">
+      <span class="ctag">Hasta 5 corrientes</span>
+      <span class="ctag">4 componentes</span>
+      <span class="ctag">Paso a paso</span>
+      <span class="ctag">General</span>
+    </div>
+    <div class="card-cta">Abrir calculadora</div>
+  </a>
+
+</div>
+
+<!-- Bottom info -->
+<div class="bottom">
+  <div class="bottom-cell">
+    <div class="bottom-title">Metodología Felder & Rousseau</div>
+    <div class="step-list">
+      <div class="step-item"><div class="step-num">1</div><span>Interpretar el problema e identificar incógnitas y datos</span></div>
+      <div class="step-item"><div class="step-num">2</div><span>Dibujar el diagrama de flujo y etiquetar corrientes</span></div>
+      <div class="step-item"><div class="step-num">3</div><span>Elegir base de cálculo (masa o tiempo)</span></div>
+      <div class="step-item"><div class="step-num">4</div><span>Analizar grados de libertad (G.L. = 0 para sistema determinado)</span></div>
+      <div class="step-item"><div class="step-num">5</div><span>Plantear y resolver el sistema de ecuaciones</span></div>
+      <div class="step-item"><div class="step-num">6</div><span>Verificar con un balance independiente no utilizado</span></div>
+    </div>
+  </div>
+  <div class="bottom-cell">
+    <div class="bottom-title">Referencias Bibliográficas</div>
+    <div class="ref-line">Felder, R.M. & Rousseau, R.W. (2004). <em>Principios elementales de los procesos químicos</em>. Limusa Wiley.</div>
+    <div class="ref-line">Himmelblau, D.M. (1997). <em>Principios básicos y cálculos en ingeniería química</em>. Prentice-Hall.</div>
+    <div class="ref-line">Repositorio GitHub: <a href="https://github.com/lemeit/bm" style="color:var(--accent)">lemeit/bm</a> — Código fuente de acceso libre.</div>
+    <div class="ref-line">Implementación: HTML5 + JS vanilla, sin dependencias. Optimizado para navegador y móvil.</div>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-left">
+    Prof. Ing. Luciano Lamaita &mdash; EEST N°1 "Gral. Savio" Saladillo &mdash; Laboratorio de Industrias · 7° TQ
+  </div>
+  <div class="footer-right">Material educativo de acceso libre · Sin instalación</div>
+</footer>
+
 </body>
 </html>
